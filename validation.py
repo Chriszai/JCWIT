@@ -1,25 +1,22 @@
 import sys
 import subprocess
 import random
+import string
 
 
 def GetType(argv):
     type = []
-    if (len(argv) == 3):
-        variableType = argv[2].lower()
-        type.append(variableType)
-    else:
-        with open(sys.argv[1], "rt") as fin:
-            for line in fin:
-                index = line.find('Verifier.')
-                if(index != -1):
-                    variableType = line[index + 15 : -4].lower().replace(')','').replace('(','')
-                    type.append(variableType)
+    with open(sys.argv[2], "rt") as fin:
+        for line in fin:
+            index = line.find('Verifier.')
+            if(index != -1):
+                variableType = line[index + 15 : -4].lower().replace(')','').replace('(','')
+                type.append(variableType)
     print(type)
     return type
 
 def GetInvariant(witnessFile, argv):
-    className = argv[1][0:-4]
+    className = argv[2][0:-4]
     arr = []
     for data in witnessFile.nodes(data=True):
         if 'invariant' and 'invariant.scope' in data[1]:
@@ -38,25 +35,30 @@ def GetSeed(arr,types):
             elif types[i] == 'long':
                 arr[i] = str(random.randint(-2^63,2^63 - 1)) + 'L'
             elif types[i] == 'short':
-                arr[i] = '(short)' + str(random.randint(-2^15,2^15 - 1))
+                arr[i] = '(short)' + str(random.randint(-2^31,2^31-1))
             elif types[i] == 'float':
-                arr[i] = str(float(random.randint(-2^128,2^128))) + 'F'
+                tmp = random.uniform(0,1)
+                arr[i] = str(round(tmp,len(str(tmp))-10)) + 'F'
             elif types[i] == 'boolean':
                 arr[i] = str(random.getrandbits(1))
             elif types[i] == 'char':
                 arr[i] = ''.join(random.sample(string.ascii_letters + string.digits, 1))
+            elif types[i] == 'double':
+                arr[i] = str(random.uniform(0,1)) + 'D'
+            elif types[i] == 'byte':
+                arr[i] = '(byte)' + str(random.randint(-2^31,2^31-1))
+            elif type[i] == 'string':
+                size = random.randint(0,2^31 - 1)
+                bytes = [None] * size
+                for index in range(size):
+                    rnd = random.randint(32,1114111)
+                    # n = min(size - index,4)# Integer.size/Byte.size
+                    # while(n > 0):
+                    #     rnd >>= 1
+                    #     n = n - 1
+                    bytes[index] = chr(rnd)
+                arr[i] = bytes
     return arr
-
-
-# def GetSeed(witnessFile):
-#     for data in witnessFile.nodes(data=True):
-#         if 'invariant' and 'invariant.scope' in data[1]:
-#             invariant = data[1]['invariant']
-#             scope = data[1]['invariant.scope']
-#             if (invariant.startswith('anonlocal') and 'createSeed' in scope):
-#                 seed = invariant.split(' = ')[1][: -1]
-#                 return seed
-#     return '0'
 
 
 def HarnessRunning(types, Invariants, length, className):
@@ -68,14 +70,8 @@ def HarnessRunning(types, Invariants, length, className):
             for line in fin:
                 line = line.replace('ClassName', className[0:-5])
                 fout.write(line)
-        # subprocess.Popen(['javac', 'ValidationHarness.java']).wait()
-        # # Execute validation harness
-        # subprocess.Popen(['java','-ea','ValidationHarness']).wait()
-
 
 def StateCreation(type, Invariant, className):
-    print(type)
-    print(Invariant)
     with open("MockTemplate.txt", "rt") as file:
         line = file.read()
         # line = line.replace('ClassName', className[0:-5])
@@ -103,18 +99,18 @@ def StateCreation(type, Invariant, className):
                 line = line.replace('Type', 'nondetString'). replace(
                     ' Invariant', '"' + Invariant + '"')
         if(type == 'char'):
-                line = line.replace(' Type', 'nondetChar'). replace(
+                line = line.replace('Type', 'nondetChar'). replace(
                     ' Invariant', '\'' + chr(int(Invariant)) + '\'')
         if(type == 'boolean'):
             if(Invariant == '1'):
-                 line = line.replace(' Type', 'nondetBoolean').replace(
+                 line = line.replace('Type', 'nondetBoolean').replace(
                     'Invariant', 'true')
             if(Invariant == '0'):
                 line = line.replace('Type', 'nondetBoolean').replace(
                     'Invariant', 'false')
 
         with open("MockStatement.txt", "w") as file:
-            # 将修改后的内容写入文件
+            # Write the modified content to a file.
             file.write(line)
 
 

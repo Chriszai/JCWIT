@@ -3,7 +3,7 @@ package org.sosy_lab.sv_benchmarks;
 import java.util.Random;
 
 public final class Verifier {
-  public void assume(boolean condition) {
+  public static void assume(boolean condition) {
     if (!condition) {
       Runtime.getRuntime().halt(1);
     }
@@ -41,16 +41,12 @@ public final class Verifier {
     return new Random().nextDouble();
   }
 
-  public String nondetString() {
+  public static String nondetString() {
     Random random = new Random();
     int size = random.nextInt();
     assume(size >= 0);
     byte[] bytes = new byte[size];
     random.nextBytes(bytes);
     return new String(bytes);
-  }
-
-  public static void main(String[] args) {
-
   }
 }

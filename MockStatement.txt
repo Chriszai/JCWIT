@@ -1,1 +1,0 @@
-        when(Verifier.Type()).thenReturn(true);            

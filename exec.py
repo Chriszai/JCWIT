@@ -4,20 +4,23 @@ import networkx as nx
 import numpy as np
 import validation as validation
 
+# How to call this script:
+# ./jcwvalidator.py --witness source
+# or
+# ./jcwvalidator.py --version
 
-def GetType(argv):
-    print('No violation founded')
-    if (len(sys.argv) == 3):
-        variableType = argv[2].lower()
-    else:
-        with open(sys.argv[1], "rt") as fin:
-            for line in fin:
-                index = line.find('verifier.')
-                if(index != -1):
-                    subStringIndex = line.find('(')
-                    variableType = line[index + 15:subStringIndex].lower()
-                    print(variableType)
-    return variableType
+# def GetType(argv):
+#     if (len(sys.argv) == 3):
+#         variableType = argv[2].lower()
+#     else:
+#         with open(sys.argv[1], "rt") as fin:
+#             for line in fin:
+#                 index = line.find('verifier.')
+#                 if(index != -1):
+#                     subStringIndex = line.find('(')
+#                     variableType = line[index + 15:subStringIndex].lower()
+#                     print(variableType)
+#     return variableType
 
 
 def CollatingData(file):
@@ -88,53 +91,86 @@ def InspectionRing(node, edgeDict, arr):
                 return False
     return True
 
+try:
+    if sys.argv[1] == "--version":
+        if len(sys.argv) <= 2:
+            print('Version: 1.0')
+            exit(0)
+        # missing witness or java files
+        print('Witness result: Unknown')
+        exit(0)
 
-classnameArray = sys.argv[1].split('.')
-classname = classnameArray[0]
-if len(classnameArray) == 2 and classnameArray[1] == 'java':
-    subprocess.Popen(['javac', sys.argv[1]]).wait()
+    suffix = sys.argv[2][-4:]
+    if len(suffix) ==  4  and suffix == 'java':
+        subprocess.Popen(['javac', sys.argv[2]]).wait()
+    classname = sys.argv[2][:-5]
+
+    print('Version: 1.0')
+except Exception as e:
+    print('Witness result: Unknown')
 
 variableType =''
-if(classnameArray[1] == 'class'):
-    variableType = sys.argv[2].lower()
+# if(classnameArray[1] != 'java'):
+#     print("Please provide the java file(with the .java filename extension).")
+#     print('Witness result: Unknown')
+#     exit(0)
 
 cmd = 'jbmc ' + classname + ' --stop-on-fail --graphml-witness witness'
 try:
     result = subprocess.check_output(cmd, shell=True)
 except subprocess.CalledProcessError as e:
-    result = e.output
+    print(e)
+    print('Witness result: Unknown')
+    exit(0)
 
 witnessFile = nx.read_graphml("witness")
 violation = False
 for violationKey in witnessFile.nodes(data=True):
-    if 'isViolationNode' in violationKey[1]:  
+    if 'isViolationNode' in violationKey[1]: 
         violation = True
 
 if(violation == False):
     # It is used for get the type of the invariant
     # variableType = GetType(sys.argv)
     # It is used for collate the data
-    print('No violation founded')
+    print("Witness result: True")
     isIntegrity = CollatingData(witnessFile)
     if(isIntegrity == True):
         print('This correctness witness is complete.')
+    else:
+        print('This correctness witness is not complete.')
+        print("Witness validation: False")
+        exit(0)
+    
     hasRing = CreateEdgeDict(witnessFile)
     if(hasRing == True):
         print('This correctness witness does not have a ring.')
+    else:
+        print('This correctness witness does have a ring.')
+        print("Witness validation: False")
+        exit(0)
     # It is used for get the type of the invariant
-    if not variableType:
-        variableType = validation.GetType(sys.argv)
+    
+    variableType = validation.GetType(sys.argv)
     Invariant = validation.GetInvariant(witnessFile, sys.argv)
     print(Invariant)
     seed = validation.GetSeed(Invariant,variableType)
     if len(variableType) == 0:
         exit(1)
     validation.HarnessRunning(
-        variableType, seed, len(variableType), sys.argv[1])
+        variableType, seed, len(variableType), sys.argv[2])
 
-    print('Completed validation, consistent with JBMC result, the reault is true')
+    try:
+        subprocess.Popen(['javac', 'ValidationHarness.java']).wait()
+        # Execute validation harness
+        subprocess.Popen(['java','-ea','ValidationHarness']).wait()
+    except Exception as e:
+        print(e)
+        print("Witness validation: False")
+        exit(0)
 
+    print('Witness validation: True')
 
 else:
-    print('Violation founded')
+    print("Witness result: False")
     exit(1)
