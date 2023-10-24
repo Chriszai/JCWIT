@@ -58,6 +58,6 @@ public class Short {
     if (x <= r) System.out.println("branch BOO1");
     else System.out.println("branch BOO2");
 
-    // assert true;
+    assert true;
   }
 }

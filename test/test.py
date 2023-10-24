@@ -19,7 +19,7 @@ for index in range(size):
 # x >>=1
 # print(chr(488)) 1114111
 # x = str(round(tmp,len(str(tmp))-10)) + 'F'
-print(chr(2))
-line = "Version: 1.0"
-version = float(line[line.index("Version: ") + 9:])
+line = ["Version: 1.0"]
+version = ["sfddf",'fsddds']
+version=version + line
 print(version)
