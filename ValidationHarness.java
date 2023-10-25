@@ -6,7 +6,7 @@ public class ValidationHarness {
         mockStatic(Verifier.class);
         
         // The statement is inserted here
-        when(Verifier.nondetShort()).thenReturn((short)-23);            
+        when(Verifier.nondetShort()).thenReturn((short)-25);            
         
         try {
             Short.main(new String[0]);

@@ -4,8 +4,8 @@ import networkx as nx
 import validation as validation
 import os
 
-# How to call this script:
-# ./jcwit.py --witness [witness_file] [list of folders/files]
+# How to call this script on Linux:
+# ./jcwit.py --witness [witness_file] [list of folders/JavaFiles]
 # or
 # ./jcwit.py --version
 
@@ -164,15 +164,21 @@ if (violation == False):
     validation.HarnessRunning(
         variableType, seed, len(variableType), sys.argv[3])
 
+    # Check the operating system of this machine
     pathWin = ".;./dependencies/byte-buddy-1.14.1.jar;./dependencies/byte-buddy-agent-1.14.1.jar;./dependencies/mockito-core-5.2.0.jar;./dependencies/objenesis-3.3.jar"
     pathLin = ".:./dependencies/byte-buddy-1.14.1.jar:./dependencies/byte-buddy-agent-1.14.1.jar:./dependencies/mockito-core-5.2.0.jar:./dependencies/objenesis-3.3.jar"
 
+    if sys.platform.startswith('linux'):
+        path = pathLin
+    else:
+        path = pathWin
+
     # Rerunning the program that has been injected the harness
     try:
-        process1 = subprocess.Popen(['javac', '-cp', pathWin, 'ValidationHarness.java'], shell=True).wait()
+        process1 = subprocess.Popen(['javac', '-cp', path, 'ValidationHarness.java'], shell=True).wait()
         # Execute validation harness
         process2 = subprocess.Popen(
-            ['java', '-ea', '-cp', pathWin, 'ValidationHarness'], shell=True).wait()
+            ['java', '-ea', '-cp', path, 'ValidationHarness'], shell=True).wait()
     except Exception as e:
         print(e)
         print("Witness validation: False")

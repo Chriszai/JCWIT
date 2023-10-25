@@ -22,11 +22,11 @@ dependencies separately, or just import Mockito-core if you are using a tool suc
 
 Next, run the script with the benchmark using the following command:
 
-**python3 exec.py --witness <FILE_NAME>**
+**./jcwit.py --witness [witness_file] [list of folders/JavaFiles]**
 
 OR
 
-**python3 exec.py --version**
+**./jcwit.py --version**
 
 The first line of the command will validate the input file, which can be either a .java or a .class file, and the script will automatically convert the file format to .class internally. 
 The second command is used to check the version of the script currently in use.
