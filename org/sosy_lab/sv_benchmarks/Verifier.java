@@ -1,3 +1,11 @@
+// This file is part of the SV-Benchmarks collection of verification tasks:
+// https://github.com/sosy-lab/sv-benchmarks
+//
+// SPDX-FileCopyrightText: Contributed by Peter Schrammel
+// SPDX-FileCopyrightText: 2011-2020 The SV-Benchmarks Community
+//
+// SPDX-License-Identifier: Apache-2.0
+
 package org.sosy_lab.sv_benchmarks;
 
 import java.util.Random;

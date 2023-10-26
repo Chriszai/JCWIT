@@ -44,340 +44,139 @@
   <graph edgedefault="directed">
     <data key="sourcecodelang">C</data>
     <node id="sink">
-      <data key="invariant">this = &amp;dynamic_object$12;</data>
-      <data key="invariant.scope">java::Short.test:(III)V</data>
+      <data key="invariant">anonlocal::2a = (void *)return_tmp1;</data>
+      <data key="invariant.scope">java::StringValueOf04.main:([Ljava/lang/String;)V</data>
     </node>
-    <node id="368.201">
+    <node id="261.18">
       <data key="entry">true</data>
     </node>
-    <edge source="368.201" target="369.215">
-      <data key="originfile">Short.java</data>
-      <data key="startline">34</data>
+    <edge source="261.18" target="262.32">
+      <data key="originfile">StringValueOf04.java</data>
+      <data key="startline">13</data>
     </edge>
-    <node id="368.202"/>
-    <node id="368.204"/>
-    <node id="368.206"/>
-    <node id="368.208"/>
-    <node id="368.210"/>
-    <node id="368.212"/>
-    <node id="369.215">
+    <node id="261.19"/>
+    <node id="261.21"/>
+    <node id="261.23"/>
+    <node id="261.25"/>
+    <node id="261.27"/>
+    <node id="261.29"/>
+    <node id="262.32">
       <data key="invariant">dynamic_object = nondet_symbol&lt;struct java::array[reference]&gt;(symex::nondet1);</data>
       <data key="invariant.scope">__CPROVER__start</data>
     </node>
-    <edge source="369.215" target="372.229">
-      <data key="originfile">Short.java</data>
-      <data key="startline">34</data>
+    <edge source="262.32" target="265.46">
+      <data key="originfile">StringValueOf04.java</data>
+      <data key="startline">13</data>
     </edge>
-    <node id="369.217"/>
-    <node id="369.219"/>
-    <node id="369.221"/>
-    <node id="369.223"/>
-    <node id="372.229">
+    <node id="262.34"/>
+    <node id="262.36"/>
+    <node id="262.38"/>
+    <node id="262.40"/>
+    <node id="265.46">
+      <data key="invariant">dynamic_object.@java.lang.Object.@class_identifier = "java::array[reference]";</data>
+      <data key="invariant.scope">__CPROVER__start</data>
+    </node>
+    <edge source="265.46" target="268.50">
+      <data key="originfile">StringValueOf04.java</data>
+      <data key="startline">13</data>
+    </edge>
+    <node id="268.50">
       <data key="invariant">dynamic_object = nondet_symbol&lt;struct java::array[reference]&gt;(symex::nondet1);</data>
       <data key="invariant.scope">__CPROVER__start</data>
     </node>
-    <edge source="372.229" target="375.233">
-      <data key="originfile">Short.java</data>
-      <data key="startline">34</data>
+    <edge source="268.50" target="269.51">
+      <data key="originfile">StringValueOf04.java</data>
+      <data key="startline">13</data>
     </edge>
-    <node id="375.233">
-      <data key="invariant">dynamic_object = nondet_symbol&lt;struct java::array[reference]&gt;(symex::nondet1);</data>
-      <data key="invariant.scope">__CPROVER__start</data>
-    </node>
-    <edge source="375.233" target="376.234">
-      <data key="originfile">Short.java</data>
-      <data key="startline">34</data>
-    </edge>
-    <node id="376.234">
+    <node id="269.51">
       <data key="invariant">dynamic_object.data = (void **)dynamic_array;</data>
       <data key="invariant.scope">__CPROVER__start</data>
     </node>
-    <edge source="376.234" target="388.268">
-      <data key="originfile">Short.java</data>
-      <data key="startline">34</data>
+    <edge source="269.51" target="281.85">
+      <data key="originfile">StringValueOf04.java</data>
+      <data key="startline">13</data>
     </edge>
-    <node id="376.236"/>
-    <node id="376.238"/>
-    <node id="376.240"/>
-    <node id="376.242"/>
-    <node id="376.244"/>
-    <node id="388.268">
+    <node id="269.53"/>
+    <node id="269.55"/>
+    <node id="269.57"/>
+    <node id="269.59"/>
+    <node id="269.61"/>
+    <node id="281.85">
       <data key="invariant">dynamic_array = ARRAY_OF(null);</data>
       <data key="invariant.scope">__CPROVER__start</data>
     </node>
-    <edge source="388.268" target="401.528">
-      <data key="originfile">Short.java</data>
-      <data key="startline">34</data>
+    <edge source="281.85" target="294.345">
+      <data key="originfile">StringValueOf04.java</data>
+      <data key="startline">13</data>
     </edge>
-    <node id="388.304"/>
-    <node id="388.340"/>
-    <node id="388.376"/>
-    <node id="388.412"/>
-    <node id="401.528">
+    <node id="281.121"/>
+    <node id="281.157"/>
+    <node id="281.193"/>
+    <node id="281.229"/>
+    <node id="294.345">
       <data key="invariant">dynamic_object$1 = nondet_symbol&lt;char [INFINITY()]&gt;(symex::nondet5);</data>
       <data key="invariant.scope">__CPROVER__start</data>
     </node>
-    <edge source="401.528" target="4.535">
-      <data key="originfile">Short.java</data>
-      <data key="startline">34</data>
+    <edge source="294.345" target="2.354">
+      <data key="originfile">StringValueOf04.java</data>
+      <data key="startline">13</data>
     </edge>
-    <node id="4.535">
+    <node id="2.354">
       <data key="invariant">arg0a = &amp;dynamic_object;</data>
       <data key="invariant.scope">__CPROVER__start</data>
     </node>
-    <edge source="4.535" target="5.540">
+    <edge source="2.354" target="3.359">
       <data key="originfile">org/sosy_lab/sv_benchmarks/Verifier.java</data>
-      <data key="startline">25</data>
+      <data key="startline">21</data>
     </edge>
-    <node id="4.537"/>
-    <node id="5.540">
+    <node id="2.356"/>
+    <node id="3.359">
       <data key="invariant">dynamic_object$10 = nondet_symbol&lt;struct java.util.Random&gt;(symex::nondet22);</data>
-      <data key="invariant.scope">java::org.sosy_lab.sv_benchmarks.Verifier.nondetShort:()S</data>
+      <data key="invariant.scope">java::org.sosy_lab.sv_benchmarks.Verifier.nondetBoolean:()Z</data>
     </node>
-    <edge source="5.540" target="8.543">
+    <edge source="3.359" target="6.362">
       <data key="originfile">org/sosy_lab/sv_benchmarks/Verifier.java</data>
-      <data key="startline">25</data>
+      <data key="startline">21</data>
     </edge>
-    <node id="8.543">
+    <node id="6.362">
       <data key="invariant">dynamic_object$10.@class_identifier = "java::java.util.Random";</data>
-      <data key="invariant.scope">java::org.sosy_lab.sv_benchmarks.Verifier.nondetShort:()S</data>
+      <data key="invariant.scope">java::org.sosy_lab.sv_benchmarks.Verifier.nondetBoolean:()Z</data>
     </node>
-    <edge source="8.543" target="11.548">
+    <edge source="6.362" target="9.367">
       <data key="originfile">org/sosy_lab/sv_benchmarks/Verifier.java</data>
-      <data key="startline">25</data>
+      <data key="startline">21</data>
     </edge>
-    <node id="11.548">
+    <node id="9.367">
       <data key="invariant">this = &amp;dynamic_object$10;</data>
-      <data key="invariant.scope">java::org.sosy_lab.sv_benchmarks.Verifier.nondetShort:()S</data>
+      <data key="invariant.scope">java::org.sosy_lab.sv_benchmarks.Verifier.nondetBoolean:()Z</data>
     </node>
-    <edge source="11.548" target="77.556">
+    <edge source="9.367" target="48.375">
       <data key="originfile">org/sosy_lab/sv_benchmarks/Verifier.java</data>
-      <data key="startline">25</data>
+      <data key="startline">21</data>
     </edge>
-    <node id="77.556">
+    <node id="48.375">
       <data key="invariant">this = &amp;dynamic_object$10;</data>
-      <data key="invariant.scope">java::org.sosy_lab.sv_benchmarks.Verifier.nondetShort:()S</data>
+      <data key="invariant.scope">java::org.sosy_lab.sv_benchmarks.Verifier.nondetBoolean:()Z</data>
     </node>
-    <edge source="77.556" target="78.557">
-      <data key="originfile">Short.java</data>
-      <data key="startline">34</data>
+    <edge source="48.375" target="49.378">
+      <data key="originfile">StringValueOf04.java</data>
+      <data key="startline">13</data>
     </edge>
-    <node id="78.557">
+    <node id="49.378">
       <data key="invariant">anonlocal::1i = (int)return_tmp0;</data>
-      <data key="invariant.scope">java::Short.main:([Ljava/lang/String;)V</data>
+      <data key="invariant.scope">java::StringValueOf04.main:([Ljava/lang/String;)V</data>
     </node>
-    <edge source="78.557" target="87.564">
-      <data key="originfile">Short.java</data>
-      <data key="startline">35</data>
+    <edge source="49.378" target="52.424">
+      <data key="originfile">StringValueOf04.java</data>
+      <data key="startline">14</data>
     </edge>
-    <node id="87.564"/>
-    <edge source="87.564" target="110.576">
-      <data key="originfile">Short.java</data>
-      <data key="startline">36</data>
-    </edge>
-    <node id="110.576">
-      <data key="invariant">anonlocal::2i = anonlocal::1i;</data>
-      <data key="invariant.scope">java::Short.main:([Ljava/lang/String;)V</data>
+    <node id="52.424">
+      <data key="invariant">stub_ignored_arg0 = anonlocal::1i == 0 ? false : true;</data>
+      <data key="invariant.scope">java::StringValueOf04.main:([Ljava/lang/String;)V</data>
     </node>
-    <edge source="110.576" target="113.581">
-      <data key="originfile">Short.java</data>
-      <data key="startline">29</data>
+    <edge source="52.424" target="sink">
+      <data key="originfile">StringValueOf04.java</data>
+      <data key="startline">14</data>
     </edge>
-    <node id="113.581">
-      <data key="invariant">this = &amp;Short@class_model;</data>
-      <data key="invariant.scope">java::Short.&lt;clinit&gt;:()V</data>
-    </node>
-    <edge source="113.581" target="121.593">
-      <data key="originfile">Short.java</data>
-      <data key="startline">29</data>
-    </edge>
-    <node id="121.593"/>
-    <edge source="121.593" target="89.596">
-      <data key="originfile">Short.java</data>
-      <data key="startline">29</data>
-    </edge>
-    <node id="89.596">
-      <data key="invariant">$assertionsDisabled = $stack_tmp1 == 0 ? false : true;</data>
-      <data key="invariant.scope">java::Short.&lt;clinit&gt;:()V</data>
-    </node>
-    <edge source="89.596" target="90.602">
-      <data key="originfile">Short.java</data>
-      <data key="startline">38</data>
-    </edge>
-    <node id="89.597"/>
-    <node id="89.599"/>
-    <node id="90.602">
-      <data key="invariant">dynamic_object$11 = nondet_symbol&lt;struct Short&gt;(symex::nondet25);</data>
-      <data key="invariant.scope">java::Short.main:([Ljava/lang/String;)V</data>
-    </node>
-    <edge source="90.602" target="93.605">
-      <data key="originfile">Short.java</data>
-      <data key="startline">38</data>
-    </edge>
-    <node id="93.605">
-      <data key="invariant">dynamic_object$11.@java.lang.Object.@class_identifier = "java::Short";</data>
-      <data key="invariant.scope">java::Short.main:([Ljava/lang/String;)V</data>
-    </node>
-    <edge source="93.605" target="20.608">
-      <data key="originfile">Short.java</data>
-      <data key="startline">38</data>
-    </edge>
-    <node id="20.608">
-      <data key="invariant">this = &amp;dynamic_object$11;</data>
-      <data key="invariant.scope">java::Short.main:([Ljava/lang/String;)V</data>
-    </node>
-    <edge source="20.608" target="94.612">
-      <data key="originfile">Short.java</data>
-      <data key="startline">29</data>
-    </edge>
-    <node id="94.612">
-      <data key="invariant">this = (struct java.lang.Object *)&amp;dynamic_object$11;</data>
-      <data key="invariant.scope">java::Short.&lt;init&gt;:()V</data>
-    </node>
-    <edge source="94.612" target="96.618">
-      <data key="originfile">Short.java</data>
-      <data key="startline">38</data>
-    </edge>
-    <node id="96.618">
-      <data key="invariant">anonlocal::3a = (void *)&amp;dynamic_object$11;</data>
-      <data key="invariant.scope">java::Short.main:([Ljava/lang/String;)V</data>
-    </node>
-    <edge source="96.618" target="100.625">
-      <data key="originfile">Short.java</data>
-      <data key="startline">39</data>
-    </edge>
-    <node id="100.625">
-      <data key="invariant">field = anonlocal::1i;</data>
-      <data key="invariant.scope">java::Short.main:([Ljava/lang/String;)V</data>
-    </node>
-    <edge source="100.625" target="26.650">
-      <data key="originfile">Short.java</data>
-      <data key="startline">40</data>
-    </edge>
-    <node id="100.626"/>
-    <node id="100.627"/>
-    <node id="100.628"/>
-    <node id="26.650">
-      <data key="invariant">this = &amp;dynamic_object$11;</data>
-      <data key="invariant.scope">java::Short.main:([Ljava/lang/String;)V</data>
-    </node>
-    <edge source="26.650" target="27.653">
-      <data key="originfile">Short.java</data>
-      <data key="startline">49</data>
-    </edge>
-    <node id="26.651"/>
-    <node id="27.653">
-      <data key="invariant">this = &amp;dynamic_object$12;</data>
-      <data key="invariant.scope">java::Short.test:(III)V</data>
-    </node>
-    <edge source="27.653" target="28.654">
-      <data key="originfile">Short.java</data>
-      <data key="startline">50</data>
-    </edge>
-    <node id="28.654">
-      <data key="invariant">anonlocal::4i = 3;</data>
-      <data key="invariant.scope">java::Short.test:(III)V</data>
-    </node>
-    <edge source="28.654" target="29.655">
-      <data key="originfile">Short.java</data>
-      <data key="startline">51</data>
-    </edge>
-    <node id="29.655">
-      <data key="invariant">arg3i = arg1i + arg2i;</data>
-      <data key="invariant.scope">java::Short.test:(III)V</data>
-    </node>
-    <edge source="29.655" target="30.656">
-      <data key="originfile">Short.java</data>
-      <data key="startline">52</data>
-    </edge>
-    <node id="30.656">
-      <data key="invariant">arg1i = arg2i + -3;</data>
-      <data key="invariant.scope">java::Short.test:(III)V</data>
-    </node>
-    <edge source="30.656" target="31.657">
-      <data key="originfile">Short.java</data>
-      <data key="startline">53</data>
-    </edge>
-    <node id="31.657">
-      <data key="invariant">arg2i = arg3i;</data>
-      <data key="invariant.scope">java::Short.test:(III)V</data>
-    </node>
-    <edge source="31.657" target="38.666">
-      <data key="originfile">Short.java</data>
-      <data key="startline">54</data>
-    </edge>
-    <node id="38.666"/>
-    <edge source="38.666" target="40.673">
-      <data key="originfile">Short.java</data>
-      <data key="startline">55</data>
-    </edge>
-    <node id="38.667"/>
-    <node id="40.673">
-      <data key="invariant">this = &amp;dynamic_object$12;</data>
-      <data key="invariant.scope">java::Short.test:(III)V</data>
-    </node>
-    <edge source="40.673" target="42.676">
-      <data key="originfile">Short.java</data>
-      <data key="startline">56</data>
-    </edge>
-    <node id="42.676"/>
-    <edge source="42.676" target="43.681">
-      <data key="originfile">Short.java</data>
-      <data key="startline">56</data>
-    </edge>
-    <node id="42.678"/>
-    <node id="43.681">
-      <data key="invariant">dynamic_object$13 = nondet_symbol&lt;struct java.lang.AssertionError&gt;(symex::nondet27);</data>
-      <data key="invariant.scope">java::Short.test:(III)V</data>
-    </node>
-    <edge source="43.681" target="46.684">
-      <data key="originfile">Short.java</data>
-      <data key="startline">56</data>
-    </edge>
-    <node id="46.684">
-      <data key="invariant">dynamic_object$13.@class_identifier = "java::java.lang.AssertionError";</data>
-      <data key="invariant.scope">java::Short.test:(III)V</data>
-    </node>
-    <edge source="46.684" target="47.687">
-      <data key="originfile">Short.java</data>
-      <data key="startline">56</data>
-    </edge>
-    <node id="47.687">
-      <data key="invariant">this = &amp;dynamic_object$13;</data>
-      <data key="invariant.scope">java::Short.test:(III)V</data>
-    </node>
-    <edge source="47.687" target="53.695">
-      <data key="originfile">Short.java</data>
-      <data key="startline">56</data>
-    </edge>
-    <node id="53.695"/>
-    <edge source="53.695" target="54.698">
-      <data key="originfile">Short.java</data>
-      <data key="startline">57</data>
-    </edge>
-    <node id="53.696"/>
-    <node id="54.698">
-      <data key="invariant">this = &amp;dynamic_object$12;</data>
-      <data key="invariant.scope">java::Short.test:(III)V</data>
-    </node>
-    <edge source="54.698" target="58.706">
-      <data key="originfile">Short.java</data>
-      <data key="startline">58</data>
-    </edge>
-    <node id="58.706"/>
-    <edge source="58.706" target="63.716">
-      <data key="originfile">Short.java</data>
-      <data key="startline">58</data>
-    </edge>
-    <node id="58.707"/>
-    <node id="63.716">
-      <data key="invariant">this = &amp;dynamic_object$12;</data>
-      <data key="invariant.scope">java::Short.test:(III)V</data>
-    </node>
-    <edge source="63.716" target="sink">
-      <data key="originfile">Short.java</data>
-      <data key="startline">59</data>
-    </edge>
-    <node id="63.717"/>
   </graph>
 </graphml>

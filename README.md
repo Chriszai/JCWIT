@@ -1,12 +1,13 @@
 # JavaExtension
 
-Installing Python 3 is necessary for this project. Here you can find a thorough installationinstructions for setting up Python on several platforms:
+Installing Python 3 is necessary for this project. Here you can find a installation instructions for setting up Python on several platforms:
 https://realpython.com/installing-python/
-The additional third-party packages required by this Python script are as follows
+
+The additional third-party packages required by this Python script are as follows：
 (mandatory)：
-• subprocess
-• sys
-• networkx
+• subprocess<br>
+• sys<br>
+• networkx<br>
 • random
 
 JBMC supports multiple platforms including Ubantu, macOS, Windows and Docker. Different versions for different platforms can be found on the official GitHub. Belowis anexample for Windows only. The GitHub link for JBMC is shown below:

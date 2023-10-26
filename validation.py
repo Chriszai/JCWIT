@@ -26,7 +26,6 @@ def GetInvariant(witnessFile, javaFile, dict_line_type):
         if 'invariant' and 'invariant.scope' in data_node[1]:
             invariant = data_node[1]['invariant']
             scope = data_node[1]['invariant.scope']
-            # startLine = data[2]["startline"]
             if (invariant.startswith('anonlocal::') and "java::" + className in scope):
                 for data_edge in witnessFile.edges(data=True):
                     if data_edge[1] == data_node[0] and dict_line_type.__contains__(data_edge[2]["startline"]):
@@ -43,26 +42,26 @@ def GetSeed(arr, types):
             elif types[i] == 'long':
                 arr[i] = str(random.randint(-(2 ^ 63), 2 ^ 63 - 1)) + 'L'
             elif types[i] == 'short':
-                arr[i] = '(short)' + str(random.randint(-2 ^ 31, 2 ^ 31-1))
+                arr[i] = '(short) ' + str(random.randint(-2 ^ 31, 2 ^ 31-1))
             elif types[i] == 'float':
                 tmp = random.uniform(0, 1)
                 arr[i] = str(round(tmp, len(str(tmp))-10)) + 'F'
             elif types[i] == 'boolean':
                 arr[i] = str(random.getrandbits(1))
             elif types[i] == 'char':
-                arr[i] = ''.join(random.sample(
-                    string.ascii_letters + string.digits, 1))
+                arr[i] = '(char) ' + str(random.randint(0, 1114111))
             elif types[i] == 'double':
                 arr[i] = str(random.uniform(0, 1)) + 'D'
             elif types[i] == 'byte':
-                arr[i] = '(byte)' + str(random.randint(-(2 ^ 31), 2 ^ 31-1))
+                arr[i] = '(byte) ' + str(random.randint(-(2 ^ 31), 2 ^ 31-1))
             elif type[i] == 'string':
                 size = random.randint(0, 2 ^ 31 - 1)
                 bytes = [None] * size
                 for index in range(size):
                     rnd = random.randint(32, 1114111)
-                    bytes[index] = chr(rnd)
-                arr[i] = bytes
+                    bytes[index] = str(chr(rnd))
+                string = ''.join(bytes)
+                arr[i] = string
     return arr
 
 
@@ -96,6 +95,9 @@ def StateCreation(type, Invariant, className):
         if (type == 'double'):
             line = line.replace('Type', 'nondetDouble').replace(
                 'Invariant', Invariant)
+        if (type == 'byte'):
+            line = line.replace('Type', 'nondetByte').replace(
+                'Invariant', Invariant)
         if (type == 'string'):
             try:
                 Invariant = int(Invariant)
@@ -106,7 +108,7 @@ def StateCreation(type, Invariant, className):
                     ' Invariant', '"' + Invariant + '"')
         if (type == 'char'):
             line = line.replace('Type', 'nondetChar'). replace(
-                ' Invariant', '\'' + chr(int(Invariant)) + '\'')
+                'Invariant', Invariant)
         if (type == 'boolean'):
             if (Invariant == '1'):
                 line = line.replace('Type', 'nondetBoolean').replace(

@@ -9,7 +9,7 @@ public class ValidationHarness {
         when(Verifier.nondetBoolean()).thenReturn(false);            
         
         try {
-            StringValueOf04.main(new String[0]);
+            ClassName.main(new String[0]);
         } 
         catch (Exception e) {
             System.out.println(e);

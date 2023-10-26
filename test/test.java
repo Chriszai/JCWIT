@@ -1,6 +1,6 @@
 import org.sosy_lab.sv_benchmarks.Verifier;
 
-public class test2 {
+public class test {
   public static void main(String[] args) {
     String arg = Verifier.nondetString();
 

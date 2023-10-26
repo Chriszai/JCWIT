@@ -86,9 +86,9 @@ def DeleteFiles():
     if os.path.exists(path): 
         os.remove(path)
 
-    path = './ValidationHarness.txt'
-    if os.path.exists(path):  
-        os.remove(path)
+    # path = './ValidationHarness.txt'
+    # if os.path.exists(path):  
+    #     os.remove(path)
 
 try:
     if sys.argv[1].lower() == "--version" or sys.argv[1].lower() == "-v":
@@ -116,8 +116,6 @@ try:
 
 except Exception as e:
     print('Witness result: Unknown')
-
-variableType = ''
 
 witnessFile = nx.read_graphml(sys.argv[2])
 violation = False
@@ -148,21 +146,26 @@ if (violation == False):
     Invariants = []
 
     # It is used for get the type and row number of all the invariants
-    for javaFile in benchmarks_dir:
-        dict_line_type, variableType = validation.GetType(javaFile)
-        types = types + variableType
-        Invariant = validation.GetInvariant(
-            witnessFile, javaFile, dict_line_type)
-        Invariants = Invariants + Invariant
+    try:
+        for javaFile in benchmarks_dir:
+            dict_line_type, variableType = validation.GetType(javaFile)
+            types = types + variableType
+            Invariant = validation.GetInvariant(
+                witnessFile, javaFile, dict_line_type)
+            Invariants = Invariants + Invariant
 
-    print(Invariants)
-    seed = validation.GetSeed(Invariants, types)
-    if len(variableType) == 0:
-        print('Witness result: Unknown')
-        exit(1)
-    # Creating harness that used for running
-    validation.HarnessRunning(
-        variableType, seed, len(variableType), sys.argv[3])
+        print(Invariants)
+        seed = validation.GetSeed(Invariants, types)
+        if len(types) == 0:
+            print('Witness validation: Unknown')
+            exit(0)
+        # Creating harness that used for running
+        validation.HarnessRunning(
+            variableType, seed, len(variableType), sys.argv[3])
+    except Exception as e:
+        print(e)
+        print('Witness validation: Unknown')
+        exit(0)
 
     # Check the operating system of this machine
     pathWin = ".;./dependencies/byte-buddy-1.14.1.jar;./dependencies/byte-buddy-agent-1.14.1.jar;./dependencies/mockito-core-5.2.0.jar;./dependencies/objenesis-3.3.jar"
@@ -189,10 +192,10 @@ if (violation == False):
         print("Witness validation: False")
         exit(0)
     else:
-        print('Witness validation: True')
+        print("Witness validation: True")
     DeleteFiles()
 
 else:
-    print("Witness result: False")
+    print("Witness result: False1")
     exit(0)
 
