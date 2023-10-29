@@ -8,8 +8,8 @@ bytes = [None] * size
 for index in range(size):
     rnd = random.randint(32, 1114111)
     bytes[index] = str(chr(rnd))
-string = ''.join(bytes)
-print(string)
+string = "".join(bytes)
+# print(string)
 
 
 # list =['s','a','v']
@@ -17,7 +17,7 @@ print(string)
 # print(type(list))
 
 
-# print(chr(1114111)) 
+# print(chr(1114111))
 # x = str(round(tmp,len(str(tmp))-10)) + 'F'
 # line = "Version: 1.0"
 # version = float(line[line.index("Version: ") + 9:])
@@ -25,3 +25,7 @@ print(string)
 # print(version)
 # if version == 1.0:
 #     print(sys.platform)
+
+line = "Witness result: Unkonown"
+if "Witness result: Unknown" or "Witness validation: Unknown" in line:
+    print("true")

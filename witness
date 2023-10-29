@@ -81,7 +81,7 @@
       <data key="startline">13</data>
     </edge>
     <node id="268.50">
-      <data key="invariant">dynamic_object = nondet_symbol&lt;struct java::array[reference]&gt;(symex::nondet1);</data>
+      <data key="invariant">dynamic_object.length = nondet_array_length;</data>
       <data key="invariant.scope">__CPROVER__start</data>
     </node>
     <edge source="268.50" target="269.51">

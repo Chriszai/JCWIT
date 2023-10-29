@@ -6,7 +6,7 @@ public class ValidationHarness {
         mockStatic(Verifier.class);
         
         // The statement is inserted here
-        when(Verifier.nondetBoolean()).thenReturn(false);            
+        when(Verifier.nondetBoolean()).thenReturn(true);            
         
         try {
             StringValueOf04.main(new String[0]);
