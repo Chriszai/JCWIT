@@ -3,8 +3,7 @@
 Installing Python 3 is necessary for this project. Here you can find a installation instructions for setting up Python on several platforms:
 https://realpython.com/installing-python/
 
-The additional third-party packages required by this Python script are as follows：
-(mandatory)：
+The additional third-party packages required by this Python script are as follows (mandatory):<br>
 • subprocess<br>
 • sys<br>
 • networkx<br>
