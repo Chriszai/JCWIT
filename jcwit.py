@@ -153,14 +153,17 @@ if violation == False:
             Invariant = validation.GetInvariant(witnessFile, javaFile, dict_line_type)
             Invariants = Invariants + Invariant
 
-        seed = validation.GetSeed(Invariants, types)
         if len(types) == 0:
             print("Witness validation: Unknown")
             exit(0)
+
+        seed = validation.GetSeed(Invariants, types)
+        
         # Creating harness that used for running
         validation.HarnessRunning(types, seed, len(types), sys.argv[3])
     except Exception as e:
         print(e)
+        DeleteFiles()
         print("Witness validation: Unknown")
         exit(0)
 

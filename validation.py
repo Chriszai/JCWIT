@@ -16,7 +16,7 @@ def GetType(file):
                 ].lower()
                 dict[row] = variableType
                 type.append(variableType)
-    # print(type)
+    print(type)
     return dict, type
 
 
