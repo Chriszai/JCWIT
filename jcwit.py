@@ -1,8 +1,12 @@
+#!/usr/bin/env python3
 import sys
 import subprocess
-import networkx as nx
 import validation as validation
 import os
+
+# sys.path.append("/home/tong/.local/lib/python3.8/site-packages")
+
+import networkx as nx
 
 # How to call this script on Linux:
 # ./jcwit.py --witness [witness_file] [list of folders/JavaFiles]
