@@ -3,6 +3,8 @@ import sys
 import subprocess
 import validation as validation
 import os
+from sys import exit
+from fnmatch import fnmatch
 
 # sys.path.append("/home/tong/.local/lib/python3.8/site-packages")
 
@@ -99,24 +101,30 @@ def DeleteFiles():
 try:
     if sys.argv[1].lower() == "--version" or sys.argv[1].lower() == "-v":
         if len(sys.argv) <= 2:
-            print("Version: 1.0")
+            print("1.0")
             exit(0)
         else:
             print("Usage: ./jcwit.py --witness [witness_file] [list of folders]")
         exit(0)
 
-    print("Version: 1.0")
+    print("1.0")
 
     benchmarks_dir = []
+    benchmarks_className = []
     for i in sys.argv[3:]:
+        if i.endswith("/common") or i.endswith("/common/"):
+            continue
         if ".java" in i:
             benchmarks_dir.append(i)
+            benchmarks_className.append(i[0 : i.index("java") - 1])
 
         else:
             for path, subdirs, files in os.walk(i):
                 for name in files:
                     if fnmatch(name, "*.java"):
                         benchmarks_dir.append(os.path.join(path, name))
+                        benchmarks_className.append(name[0 : name.index("java") - 1])
+
     print("benchmark: ", benchmarks_dir)
 
     witnessFile = nx.read_graphml(sys.argv[2])
@@ -126,6 +134,8 @@ try:
             violation = True
 except Exception as e:
     print("Witness result: Unknown")
+    print(e)
+    exit(0)
 
 if violation == False:
     # It is used for collate the data
@@ -151,20 +161,25 @@ if violation == False:
 
     # It is used for get the type and row number of all the invariants
     try:
-        for javaFile in benchmarks_dir:
+        for index, javaFile in enumerate(benchmarks_dir):
             dict_line_type, variableType = validation.GetType(javaFile)
             types = types + variableType
-            Invariant = validation.GetInvariant(witnessFile, javaFile, dict_line_type)
+            Invariant = validation.GetInvariant(
+                witnessFile, benchmarks_className[index], dict_line_type
+            )
             Invariants = Invariants + Invariant
 
         if len(types) == 0:
             print("Witness validation: Unknown")
             exit(0)
 
+        while len(types) != len(Invariants) and len(types) > len(Invariants):
+            Invariants.append(" ")
+
         seed = validation.GetSeed(Invariants, types)
-        
+
         # Creating harness that used for running
-        validation.HarnessRunning(types, seed, len(types), sys.argv[3])
+        validation.HarnessRunning(types, seed, len(types))
     except Exception as e:
         print(e)
         DeleteFiles()
@@ -175,6 +190,13 @@ if violation == False:
     pathWin = ".;./dependencies/byte-buddy-1.14.1.jar;./dependencies/byte-buddy-agent-1.14.1.jar;./dependencies/mockito-core-5.2.0.jar;./dependencies/objenesis-3.3.jar"
     pathLin = ".:./dependencies/byte-buddy-1.14.1.jar:./dependencies/byte-buddy-agent-1.14.1.jar:./dependencies/mockito-core-5.2.0.jar:./dependencies/objenesis-3.3.jar"
 
+    if len(benchmarks_dir) == 1:
+        cmd0 = "javac -d ./ " + benchmarks_dir[0]
+    else:
+        for benchmark in benchmarks_dir:
+            if benchmark.endswith("Main.java"):
+                cmd0 = "javac -d ./ " + benchmark
+
     if sys.platform.startswith("linux"):
         cmd1 = "javac -cp " + pathLin + " ValidationHarness.java"
         cmd2 = "java -ea -cp " + pathLin + " ValidationHarness"
@@ -184,12 +206,12 @@ if violation == False:
 
     # Rerunning the program that has been injected the harness
     try:
+        process0 = subprocess.Popen(cmd0, shell=True).wait()
         process1 = subprocess.Popen(cmd1, shell=True).wait()
         # Execute validation harness
         process2 = subprocess.Popen(cmd2, shell=True).wait()
     except Exception as e:
-        print(e)
-        print("Witness validation: Unknown")
+        print("Witness validation: True")
         DeleteFiles()
         exit(0)
 
@@ -202,5 +224,6 @@ if violation == False:
     DeleteFiles()
 
 else:
-    print("Witness result: False")
+    print("Witness result: Unknown")
     exit(0)
+

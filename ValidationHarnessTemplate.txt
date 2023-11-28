@@ -7,11 +7,7 @@ public class ValidationHarness {
         
         // The statement is inserted here
         
-        try {
-            ClassName.main(new String[0]);
-        } 
-        catch (Exception e) {
-            System.out.println(e);
-        }
+	    Main.main(new String[0]);
     }
 }
+

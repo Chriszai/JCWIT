@@ -21,13 +21,12 @@ def GetType(file):
 
 
 def GetInvariant(witnessFile, javaFile, dict_line_type):
-    className = javaFile[0 : javaFile.index("java")]
     arr = []
     for data_node in witnessFile.nodes(data=True):
         if "invariant" and "invariant.scope" in data_node[1]:
             invariant = data_node[1]["invariant"]
             scope = data_node[1]["invariant.scope"]
-            if invariant.startswith("anonlocal::") and "java::" + className in scope:
+            if invariant.startswith("anonlocal::") and javaFile in scope:
                 for data_edge in witnessFile.edges(data=True):
                     if data_edge[1] == data_node[0] and dict_line_type.__contains__(
                         data_edge[2]["startline"]
@@ -39,7 +38,7 @@ def GetInvariant(witnessFile, javaFile, dict_line_type):
 
 def GetSeed(arr, types):
     for i in range(len(types)):
-        if "return_tmp" in arr[i]:
+        if "return_tmp" in arr[i] or ~arr[i][0].isdigit():
             if types[i] == "int":
                 arr[i] = str(random.randint(-(2 ^ 31), 2 ^ 31 - 1))
             elif types[i] == "long":
@@ -68,16 +67,13 @@ def GetSeed(arr, types):
     return arr
 
 
-def HarnessRunning(types, Invariants, length, className):
+def HarnessRunning(types, Invariants, length):
     for i in range(0, length):
-        StateCreation(types[i], Invariants[i], className)
+        StateCreation(types[i], Invariants[i], 'Main')
         HarnessCreation(i + 8)
     with open("ValidationHarness.txt", "rt") as fin:
         with open("ValidationHarness.java", "wt") as fout:
             for line in fin:
-                line = line.replace(
-                    "ClassName", className[0 : className.index(".java")]
-                )
                 fout.write(line)
 
 
