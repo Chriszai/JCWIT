@@ -16,33 +16,88 @@ JCWIT is a  correctness-witness validator used for validating result output by J
 
 **d. ValidationHarnessTemplate.txt** - This file is a template for the validation harness and will be converted to a validation harness after the template statements are inserted.
 
-Installing Python 3 is necessary for this project. Here you can find a installation instructions for setting up Python on several platforms:
-https://realpython.com/installing-python/
+The following diagram depicts the software architecture of JCWIT.
 
-The additional third-party packages required by this Python script are as follows (mandatory):<br>
-• subprocess<br>
-• sys<br>
-• networkx<br>
-• random
+![Image text](./IMG/JCWIT.jpg)
 
-JBMC supports multiple platforms including Ubantu, macOS, Windows and Docker. Different versions for different platforms can be found on the official GitHub. Belowis anexample for Windows only. The GitHub link for JBMC is shown below:
-https://github.com/diffblue/cbmc/releases.
+# Instructions
 
-Mockito is available to download from the following site:
-https://mvnrepository.com/artifact/org.mockito/mockito-core
-If you want to use Mockito successfully, you need to download the other three
-dependencies separately, or just import Mockito-core if you are using a tool such as IDEAto install it via Maven. These dependencies are shown below: 
-• byte-buddy
-• byte-buddy-agent
-• objenesis
+Specific steps on how to use JCWIT and the third-party libraries that need to be installed (mandatory) are listed below.
 
-Next, run the script with the benchmark using the following command:
+1. Start by obtaining JCWIT from Github with the given command:
 
-**./jcwit.py --witness [witness_file] [list of folders/JavaFiles]**
+   ```
+   git clone https://github.com/Chriszai/JCWIT.git
+   ```
 
-OR
+2. Installing Python 3 is necessary for this project. Here you can find a installation instructions for setting up Python on several platforms
+   https://realpython.com/installing-python/ or use the command given below:
 
-**./jcwit.py --version**
+   ```
+   $ sudo apt-get update
+   $ sudo apt-get install python
+   ```
 
-The first line of the command will validate the input file, which can be either a .java or a .class file, and the script will automatically convert the file format to .class internally. 
-The second command is used to check the version of the script currently in use.
+   If you want to install a specific version of Python, add the specific version after "Python", for example:
+
+   ```
+   $ sudo apt-get install python3.8
+   ```
+
+3. The additional third-party packages required by this Python script are as follows (mandatory):<br>
+   • subprocess<br>
+   • sys<br>
+   • networkx<br>
+   • random
+
+   Please note that networkx needs to be installed separately; NetworkX requires Python 3.8, 3.9 or 3.10. Specific installation instructions are as follows. 
+
+   https://www.osgeo.cn/networkx/install.html, Or you can simply install it with the Linux command:
+
+   ```
+   pip install networkx[default]
+   ```
+
+4.  JBMC supports multiple platforms including Ubantu, macOS, Windows and Docker. Different versions for different platforms can be found on the official GitHub. The GitHub link for JBMC is shown below:
+
+   https://github.com/diffblue/cbmc/releases.
+
+   On Ubuntu, install CBMC by downloading the *.deb package below for your version of Ubuntu and install with
+
+   ```
+   # Ubuntu 20:
+   $ dpkg -i ubuntu-20.04-cbmc-5.95.1-Linux.deb
+   ```
+
+5. (Optional) JCWIT has already provided a complete library for the Mockito framework. The specific versions are as follows:
+
+   | [byte-buddy-1.14.1.jar](https://github.com/Chriszai/JCWIT/blob/main/dependencies/byte-buddy-1.14.1.jar) |
+   | ------------------------------------------------------------ |
+   | [byte-buddy-agent-1.14.1.jar](https://github.com/Chriszai/JCWIT/blob/main/dependencies/byte-buddy-agent-1.14.1.jar) |
+   | [mockito-core-5.2.0.jar](https://github.com/Chriszai/JCWIT/blob/main/dependencies/mockito-core-5.2.0.jar) |
+   | [objenesis-3.3.jar](https://github.com/Chriszai/JCWIT/blob/main/dependencies/objenesis-3.3.jar) |
+
+   If you want to use another version of the Mockito framework, Mockito is also available to download from the following site:
+   https://mvnrepository.com/artifact/org.mockito/mockito-core.
+   Please note that you must download the other three dependencies if you want to install them separately, or just import Mockito-core if you are using a tool such as IDEA to install via Maven. These mandatory dependencies are shown below: 
+
+   • byte-buddy
+
+   • byte-buddy-agent
+
+   • objenesis
+
+   • mockito-core
+
+6. Next, use the following command to validate the selected Java file:
+
+   ```
+   ./jcwit.py --witness <path-to-witnesses>/*.graphml <path-to-java-files>/*.java
+   ```
+   where the parameter *.graphml indicates the witness to be validated, and *.java indicates a series of Java programs to be validated or all Java files in
+   the directory of files to be validated.
+
+   ```
+   ./jcwit.py --version
+   ```
+   This command is used to check the version of the script currently in use.
