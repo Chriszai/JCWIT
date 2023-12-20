@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 import sys
 import subprocess
-import validation as validation
+import validationharness as validation
 import os
 from sys import exit
 from fnmatch import fnmatch
+import graphchecking as graph
 
 # sys.path.append("/home/tong/.local/lib/python3.8/site-packages")
 
@@ -14,77 +15,6 @@ import networkx as nx
 # ./jcwit.py --witness [witness_file] [list of folders/JavaFiles]
 # or
 # ./jcwit.py --version
-
-
-def CollatingData(file):
-    # Collating data from witnesses
-    edgeDict = {}
-    num = 0
-    for node in file.nodes(data=True):
-        if node[1].get("isEntryNode") == True:
-            entryNode = node[0]
-
-    for data in file.edges(data=True):
-        if edgeDict.get(data[0]) == None:
-            edgeDict.update({data[0]: data[1]})
-        else:
-            str = edgeDict.get(data[0]) + "," + data[1]
-            edgeDict.update({data[0]: str})
-        num = num + 1
-    return CheckIntegrity(entryNode, edgeDict, num, 0)
-
-
-def CheckIntegrity(node, edgeDict, num, cur):
-    # Check the integrity of this witness file
-    if node in edgeDict:
-        val = edgeDict.get(node)
-    else:
-        if cur == num:
-            return True
-        return False
-
-    if val == "sink":
-        if num == cur + 1:
-            return True
-        return False
-    nodes = val.split(",")
-    for node in nodes:
-        ans = CheckIntegrity(node, edgeDict, num, cur + len(nodes))
-        if ans == False:
-            return False
-    return True
-
-
-def CreateEdgeDict(file):
-    edgeDict = {}
-    arr = []
-    for node in file.nodes(data=True):
-        if node[1].get("isEntryNode") == True:
-            entryNode = node[0]
-
-    for data in file.edges(data=True):
-        if edgeDict.get(data[0]) == None:
-            edgeDict.update({data[0]: data[1]})
-        else:
-            str = edgeDict.get(data[0]) + "," + data[1]
-            edgeDict.update({data[0]: str})
-
-    return InspectionRing(entryNode, edgeDict, arr)
-
-
-def InspectionRing(node, edgeDict, arr):
-    # Checking for the presence of ring
-    if node in edgeDict:
-        arr.append(node)
-        val = edgeDict.get(node)
-        values = val.split(",")
-        for val in values:
-            if val in arr:
-                return False
-            ans = InspectionRing(val, edgeDict, arr)
-            if ans == False:
-                return False
-    return True
 
 
 def DeleteFiles():
@@ -116,14 +46,14 @@ try:
             continue
         if ".java" in i:
             benchmarks_dir.append(i)
-            benchmarks_className.append(i[0 : i.index("java") - 1])
+            benchmarks_className.append(i[0 : i.index(".java")])
 
         else:
             for path, subdirs, files in os.walk(i):
                 for name in files:
                     if fnmatch(name, "*.java"):
                         benchmarks_dir.append(os.path.join(path, name))
-                        benchmarks_className.append(name[0 : name.index("java") - 1])
+                        benchmarks_className.append(name[0 : name.index(".java")])
 
     print("benchmark: ", benchmarks_dir)
 
@@ -140,19 +70,16 @@ except Exception as e:
 if violation == False:
     # It is used for collate the data
     print("Witness result: True")
-    isIntegrity = CollatingData(witnessFile)
-    if isIntegrity == True:
-        print("This correctness witness is complete.")
-    else:
-        print("This correctness witness is not complete.")
-        print("Witness validation: False")
-        exit(0)
 
-    hasRing = CreateEdgeDict(witnessFile)
-    if hasRing == True:
-        print("This correctness witness does not have a ring.")
-    else:
-        print("This correctness witness does have a ring.")
+    try:
+        isIntegrity = graph.CollatingData(witnessFile)
+        hasRing = graph.CreateEdgeDict(witnessFile)
+    except Exception as e:
+        print(e)
+        print("Witness validation: Unknown")
+        exit(0)
+    print(hasRing)
+    if isIntegrity == False or hasRing == False:
         print("Witness validation: False")
         exit(0)
 
@@ -211,7 +138,7 @@ if violation == False:
         # Execute validation harness
         process2 = subprocess.Popen(cmd2, shell=True).wait()
     except Exception as e:
-        print("Witness validation: True")
+        print("Witness validation: Unknown")
         DeleteFiles()
         exit(0)
 
@@ -224,6 +151,8 @@ if violation == False:
     DeleteFiles()
 
 else:
+    print(
+        "It is violation witness, the tool does not temporarily support violation validation."
+    )
     print("Witness result: Unknown")
     exit(0)
-
