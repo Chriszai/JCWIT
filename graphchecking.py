@@ -47,11 +47,6 @@ def CheckIntegrity(node, edgeDict, num, cur):
 
 def CreateEdgeDict(file):
     edgeDict = {}
-    arr = []
-    for node in file.nodes(data=True):
-        if node[1].get("isEntryNode") == True:
-            entryNode = node[0]
-
     for data in file.edges(data=True):
         if edgeDict.get(data[0]) == None:
             edgeDict.update({data[0]: data[1]})
@@ -59,19 +54,38 @@ def CreateEdgeDict(file):
             str = edgeDict.get(data[0]) + "," + data[1]
             edgeDict.update({data[0]: str})
     print("Data dict creation complete")
-    return InspectionRing(entryNode, edgeDict, arr)
+    print(edgeDict)
+    return InspectionCircle(edgeDict)
 
 
-def InspectionRing(node, edgeDict, arr):
-    # Checking for the presence of ring
-    if node in edgeDict:
-        arr.append(node)
-        val = edgeDict.get(node)
-        values = val.split(",")
-        for val in values:
-            if val in arr:
-                return False
-            ans = InspectionRing(val, edgeDict, arr)
-            if ans == False:
-                return False
-    return True
+def InspectionCircle(graph):
+    in_degrees = dict((u, 0) for u in graph)
+    # Initialise all vertex incidence to 0
+    num = len(in_degrees)
+    for u in graph:
+        values = graph[u].split(",")
+        for v in values:
+            if v in in_degrees:
+                in_degrees[v] += 1
+                # Calculate the incidence of each vertex
+            else:
+                in_degrees.update({v: 1})
+                num += 1
+
+    Q = [u for u in in_degrees if in_degrees[u] == 0]
+    # Filter the vertices with an incidence of 0
+    Seq = []
+    while Q:
+        u = Q.pop()
+        Seq.append(u)
+        if u in graph:
+            values = graph[u].split(",")
+            for v in values:
+                in_degrees[v] -= 1
+                if in_degrees[v] == 0:
+                    Q.append(v)
+
+    if len(Seq) == num:
+        return True
+    else:
+        return False

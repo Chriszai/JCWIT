@@ -73,13 +73,13 @@ if violation == False:
 
     try:
         isIntegrity = graph.CollatingData(witnessFile)
-        hasRing = graph.CreateEdgeDict(witnessFile)
+        isDAG = graph.CreateEdgeDict(witnessFile)
     except Exception as e:
         print(e)
         print("Witness validation: Unknown")
         exit(0)
     print(hasRing)
-    if isIntegrity == False or hasRing == False:
+    if isIntegrity == False or isDAG == False:
         print("Witness validation: False")
         exit(0)
 
