@@ -54,7 +54,6 @@ def CreateEdgeDict(file):
             str = edgeDict.get(data[0]) + "," + data[1]
             edgeDict.update({data[0]: str})
     print("Data dict creation complete")
-    print(edgeDict)
     return InspectionCircle(edgeDict)
 
 
@@ -87,5 +86,6 @@ def InspectionCircle(graph):
 
     if len(Seq) == num:
         return True
+        print("The graph of witness is DAG")
     else:
         return False
