@@ -5,7 +5,7 @@ import validationharness as validation
 import os
 from sys import exit
 from fnmatch import fnmatch
-import graphchecking as graph
+from graphchecking import WitnessChecking
 
 # sys.path.append("/home/tong/.local/lib/python3.8/site-packages")
 
@@ -26,6 +26,11 @@ def DeleteFiles():
     path = "./ValidationHarness.txt"
     if os.path.exists(path):
         os.remove(path)
+
+
+def Merge(dict1, dict2):
+    res = {**dict1, **dict2}
+    return res
 
 
 try:
@@ -71,21 +76,10 @@ if violation == False:
     # It is used for collate the data
     print("Witness result: True")
 
-    try:
-        isIntegrity = graph.CollatingData(witnessFile)
-        isDAG = graph.CreateEdgeDict(witnessFile)
-    except Exception as e:
-        print(e)
-        print("Witness validation: Unknown")
-        exit(0)
-    print(hasRing)
-    if isIntegrity == False or isDAG == False:
-        print("Witness validation: False")
-        exit(0)
-
     types = []
     Invariants = []
-
+    dict_line_assert = {}
+    graph = WitnessChecking(sys.argv[2])
     # It is used for get the type and row number of all the invariants
     try:
         for index, javaFile in enumerate(benchmarks_dir):
@@ -95,6 +89,7 @@ if violation == False:
                 witnessFile, benchmarks_className[index], dict_line_type
             )
             Invariants = Invariants + Invariant
+            dict_line_assert = Merge(dict_line_assert, graph.get_assert_dict(javaFile))
 
         if len(types) == 0:
             print("Witness validation: Unknown")
@@ -111,6 +106,18 @@ if violation == False:
         print(e)
         DeleteFiles()
         print("Witness validation: Unknown")
+        exit(0)
+
+    try:
+        isIntegrity = graph.CollatingData(witnessFile)
+        isDAG = graph.CreateEdgeDict(witnessFile)
+        stateResult = graph.AssertStateChecking(dict_line_assert, witnessFile)
+    except Exception as e:
+        print(e)
+        print("Witness validation: Unknown")
+        exit(0)
+    if isIntegrity == False or isDAG == False or stateResult == False:
+        print("Witness validation: False")
         exit(0)
 
     # Check the operating system of this machine
@@ -133,7 +140,7 @@ if violation == False:
 
     # Rerunning the program that has been injected the harness
     try:
-        process0 = subprocess.Popen(cmd0, shell=True).wait()
+        # process0 = subprocess.Popen(cmd0, shell=True).wait()
         process1 = subprocess.Popen(cmd1, shell=True).wait()
         # Execute validation harness
         process2 = subprocess.Popen(cmd2, shell=True).wait()

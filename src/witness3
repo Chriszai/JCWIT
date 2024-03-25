@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <key attr.name="originFileName" attr.type="string" for="edge" id="originfile">
+    <default>&lt;command-line&gt;</default>
+  </key>
+  <key attr.name="invariant" attr.type="string" for="node" id="invariant"/>
+  <key attr.name="invariant.scope" attr.type="string" for="node" id="invariant.scope"/>
+  <key attr.name="isViolationNode" attr.type="boolean" for="node" id="violation">
+    <default>false</default>
+  </key>
+  <key attr.name="isEntryNode" attr.type="boolean" for="node" id="entry">
+    <default>false</default>
+  </key>
+  <key attr.name="isSinkNode" attr.type="boolean" for="node" id="sink">
+    <default>false</default>
+  </key>
+  <key attr.name="enterLoopHead" attr.type="boolean" for="edge" id="enterLoopHead">
+    <default>false</default>
+  </key>
+  <key attr.name="cyclehead" attr.type="boolean" for="node" id="cyclehead">
+    <default>false</default>
+  </key>
+  <key attr.name="threadId" attr.type="int" for="edge" id="threadId">
+    <default>0</default>
+  </key>
+  <key attr.name="createThread" attr.type="int" for="edge" id="createThread">
+    <default>0</default>
+  </key>
+  <key attr.name="sourcecodeLanguage" attr.type="string" for="graph" id="sourcecodelang"/>
+  <key attr.name="programFile" attr.type="string" for="graph" id="programfile"/>
+  <key attr.name="programHash" attr.type="string" for="graph" id="programhash"/>
+  <key attr.name="specification" attr.type="string" for="graph" id="specification"/>
+  <key attr.name="architecture" attr.type="string" for="graph" id="architecture"/>
+  <key attr.name="producer" attr.type="string" for="graph" id="producer"/>
+  <key attr.name="creationtime" attr.type="string" for="graph" id="creationtime"/>
+  <key attr.name="startline" attr.type="int" for="edge" id="startline"/>
+  <key attr.name="control" attr.type="string" for="edge" id="control"/>
+  <key attr.name="assumption" attr.type="string" for="edge" id="assumption"/>
+  <key attr.name="assumption.resultfunction" attr.type="string" for="edge" id="assumption.resultfunction"/>
+  <key attr.name="assumption.scope" attr.type="string" for="edge" id="assumption.scope"/>
+  <key attr.name="enterFunction" attr.type="string" for="edge" id="enterFunction"/>
+  <key attr.name="returnFromFunction" attr.type="string" for="edge" id="returnFrom"/>
+  <key attr.name="witness-type" attr.type="string" for="graph" id="witness-type"/>
+  <graph edgedefault="directed">
+    <data key="sourcecodelang">C</data>
+    <node id="sink"/>
+    <node id="269.24">
+      <data key="entry">true</data>
+    </node>
+    <edge source="269.24" target="270.38">
+      <data key="originfile">test2.java</data>
+      <data key="startline">3</data>
+    </edge>
+    <node id="269.25"/>
+    <node id="269.27"/>
+    <node id="269.29"/>
+    <node id="269.31"/>
+    <node id="269.33"/>
+    <node id="269.35"/>
+    <node id="270.38">
+      <data key="invariant">dynamic_object = nondet_symbol&lt;struct java::array[reference]&gt;(symex::nondet1);</data>
+      <data key="invariant.scope">__CPROVER__start</data>
+    </node>
+    <edge source="270.38" target="273.52">
+      <data key="originfile">test2.java</data>
+      <data key="startline">3</data>
+    </edge>
+    <node id="270.40"/>
+    <node id="270.42"/>
+    <node id="270.44"/>
+    <node id="270.46"/>
+    <node id="273.52">
+      <data key="invariant">dynamic_object.@java.lang.Object.@class_identifier = "java::array[reference]";</data>
+      <data key="invariant.scope">__CPROVER__start</data>
+    </node>
+    <edge source="273.52" target="276.56">
+      <data key="originfile">test2.java</data>
+      <data key="startline">3</data>
+    </edge>
+    <node id="276.56">
+      <data key="invariant">dynamic_object.length = nondet_array_length;</data>
+      <data key="invariant.scope">__CPROVER__start</data>
+    </node>
+    <edge source="276.56" target="277.57">
+      <data key="originfile">test2.java</data>
+      <data key="startline">3</data>
+    </edge>
+    <node id="277.57">
+      <data key="invariant">dynamic_object.data = (void **)dynamic_array;</data>
+      <data key="invariant.scope">__CPROVER__start</data>
+    </node>
+    <edge source="277.57" target="289.91">
+      <data key="originfile">test2.java</data>
+      <data key="startline">3</data>
+    </edge>
+    <node id="277.59"/>
+    <node id="277.61"/>
+    <node id="277.63"/>
+    <node id="277.65"/>
+    <node id="277.67"/>
+    <node id="289.91">
+      <data key="invariant">dynamic_array = ARRAY_OF(null);</data>
+      <data key="invariant.scope">__CPROVER__start</data>
+    </node>
+    <edge source="289.91" target="302.351">
+      <data key="originfile">test2.java</data>
+      <data key="startline">3</data>
+    </edge>
+    <node id="289.127"/>
+    <node id="289.163"/>
+    <node id="289.199"/>
+    <node id="289.235"/>
+    <node id="302.351">
+      <data key="invariant">dynamic_object$1 = nondet_symbol&lt;char [INFINITY()]&gt;(symex::nondet5);</data>
+      <data key="invariant.scope">__CPROVER__start</data>
+    </node>
+    <edge source="302.351" target="50.363">
+      <data key="originfile">test2.java</data>
+      <data key="startline">3</data>
+    </edge>
+    <node id="50.363">
+      <data key="invariant">arg0a = &amp;dynamic_object;</data>
+      <data key="invariant.scope">__CPROVER__start</data>
+    </node>
+    <edge source="50.363" target="53.368">
+      <data key="originfile">test2.java</data>
+      <data key="startline">1</data>
+    </edge>
+    <node id="53.368">
+      <data key="invariant">this = &amp;test2@class_model;</data>
+      <data key="invariant.scope">java::test2.&lt;clinit&gt;:()V</data>
+    </node>
+    <edge source="53.368" target="61.380">
+      <data key="originfile">test2.java</data>
+      <data key="startline">1</data>
+    </edge>
+    <node id="61.380"/>
+    <edge source="61.380" target="44.385">
+      <data key="originfile">test2.java</data>
+      <data key="startline">1</data>
+    </edge>
+    <node id="44.385">
+      <data key="invariant">$assertionsDisabled = $stack_tmp1 == 0 ? false : true;</data>
+      <data key="invariant.scope">java::test2.&lt;clinit&gt;:()V</data>
+    </node>
+    <edge source="44.385" target="2.390">
+      <data key="originfile">test2.java</data>
+      <data key="startline">3</data>
+    </edge>
+    <node id="44.386"/>
+    <node id="44.387"/>
+    <node id="2.390">
+      <data key="invariant">arg0i = -5;</data>
+      <data key="invariant.scope">java::test2.main:([Ljava/lang/String;)V</data>
+    </node>
+    <edge source="2.390" target="4.395">
+      <data key="originfile">test2.java</data>
+      <data key="startline">7</data>
+    </edge>
+    <node id="4.395">
+      <data key="invariant">anonlocal::3i = -4;</data>
+      <data key="invariant.scope">java::test2.fun:(III)V</data>
+    </node>
+    <edge source="4.395" target="22.401">
+      <data key="originfile">test2.java</data>
+      <data key="startline">8</data>
+    </edge>
+    <node id="22.401"/>
+    <edge source="22.401" target="sink">
+      <data key="originfile">test2.java</data>
+      <data key="startline">13</data>
+    </edge>
+  </graph>
+</graphml>

@@ -10,4 +10,3 @@ public class ValidationHarness {
 	    Main.main(new String[0]);
     }
 }
-
