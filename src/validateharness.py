@@ -73,7 +73,6 @@ class ValidationHarness:
             raise ValueError("Input file path does not end with '.java'")
 
     def _reverify_modified_program(self, benchmark):
-        print(benchmark)
         cmd = ["jbmc", benchmark]
         proc = self.__run_command(cmd)
         # out = proc.stdout.read()

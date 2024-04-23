@@ -1,5 +1,6 @@
 import re
 import networkx as nx
+import xml.etree.ElementTree as ET
 
 
 class WitnessValidation:
@@ -8,6 +9,7 @@ class WitnessValidation:
         self.witness_path = witness_path
 
     def _read_witness(self):
+        self.move_node_to_end(self.witness_path, "sink")
         with open(self.witness_path, "r", encoding="utf-8") as file:
             data = file.read()
         # Check for malformed XML strings
@@ -55,7 +57,9 @@ class WitnessValidation:
                 return num == cur + 1
             nodes = val.split(",")
             for n in nodes:
-                if not self._check_integrity(n, edge_dict,node_arr, num, cur + len(nodes)):
+                if not self._check_integrity(
+                    n, edge_dict, node_arr, num, cur + len(nodes)
+                ):
                     return False
             return True
         return cur == num
@@ -80,3 +84,26 @@ class WitnessValidation:
                         Q.append(v)
 
         return len(Seq) == len(in_degrees)
+
+    def move_node_to_end(self, xml_file, target_id):
+        # 解析XML文件
+        tree = ET.parse(xml_file)
+        root = tree.getroot()
+
+        # 查找目标节点
+        print(tree)
+        target_node = None
+        for node in root.findall(".//node"):
+            node_id = node.get("id")
+            if node_id == target_id:
+                target_node = node
+                break
+
+        # 如果找到目标节点，则将其移动到列表的末尾
+        if target_node is not None:
+            parent = target_node.getparent()
+            parent.remove(target_node)
+            parent.append(target_node)
+
+            # 保存更改后的XML文件
+            tree.write(xml_file)

@@ -6,6 +6,7 @@ import argparse
 from witnessvalidation import WitnessValidation
 from propertyvalidation import PropertyValidation
 from validateharness import ValidationHarness
+from monitorprocessor import MonitorProcessor
 from __init__ import __version__
 
 # sys.path.append("/home/tong/.local/lib/python3.8/site-packages")
@@ -78,13 +79,18 @@ def main():
         pv = PropertyValidation(
             config["witness_file"], config["benchmark"], config["package_paths"]
         )
+        mp = MonitorProcessor(config["benchmark"], config["package_paths"])
+        mp._monitor_counter_initialization()
+        mp._monitor_counter_insertion()
+
         witness_file = wv._read_witness()
         entry_node, edge_dict, node_arr, data_num = wv._collate_data(witness_file)
         integrity = wv._check_integrity(entry_node, edge_dict, node_arr, data_num, 0)
         print(integrity)
         connectivity = wv._check_connectivity(edge_dict)
         print(connectivity)
-        pv._assertions_insertion()
+        condition_dic, method_dir = pv._assertions_insertion()
+        mp._assertions_selection_insertion(condition_dic, method_dir)
 
         vh = ValidationHarness(config["benchmark"], config["package_paths"])
         benchmark = vh._recompile_programs()

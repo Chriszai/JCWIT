@@ -118,7 +118,7 @@ def StateCreation(type, Invariant, className):
 
 
 def HarnessCreation(insert_line_number):
-    with open("MockStatement.txt", "rt") as file:
+    with open("MethodCallMonitor.txt", "rt") as file:
         insert_text = file.readlines()
     if insert_line_number == 8:
         with open("ValidationHarnessTemplate.txt", "rt") as file:
