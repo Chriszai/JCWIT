@@ -6,12 +6,18 @@ public class MethodCallMonitor {
     The method call counter will be presented as a static variable
     * */
 
-    public static int Linked_add__I = -1;
-    public static int Test_main_LString_V = -1;
+    public int Linked_add__I = 0;
+    public int Test_main_LString_V = 0;
 
-    public static void assertionImplementation (String name, boolean ... condition) throws NoSuchFieldException, IllegalAccessException {
-        Field field = MethodCallMonitor.class.getDeclaredField(name);
-        int value = field.getInt(null);
-        assert condition[value];
+    public static void assertionImplementation (String name, boolean ... condition){
+        try {
+            MethodCallMonitor methodMonitor = new MethodCallMonitor();
+            Field field = MethodCallMonitor.class.getField(name);
+            int value = (int) field.get(methodMonitor);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

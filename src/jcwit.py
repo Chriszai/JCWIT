@@ -2,164 +2,105 @@
 import sys
 import subprocess
 import validationharness as validation
-import os
-from sys import exit
-from fnmatch import fnmatch
-from graphchecking import WitnessChecking
+import argparse
+from witnessvalidation import WitnessValidation
+from propertyvalidation import PropertyValidation
+from validateharness import ValidationHarness
+from monitorprocessor import MonitorProcessor
+from __init__ import __version__
 
 # sys.path.append("/home/tong/.local/lib/python3.8/site-packages")
 
 import networkx as nx
 
+
 # How to call this script on Linux:
 # ./jcwit.py --witness [witness_file] [list of folders/JavaFiles]
 # or
 # ./jcwit.py --version
+def dir_path(path):
+    """
+    Checks if a path is a valid directory
+    :param path: Potential directory
+    :return: The original path if valid
+    """
+    if os.path.isdir(path):
+        return path
+    raise argparse.ArgumentTypeError(f"readable_dir:{path} is not a valid path")
 
 
-def DeleteFiles():
-    # File path
-    path = "./MockStatement.txt"
-    if os.path.exists(path):
-        os.remove(path)
-
-    path = "./ValidationHarness.txt"
-    if os.path.exists(path):
-        os.remove(path)
-
-
-def Merge(dict1, dict2):
-    res = {**dict1, **dict2}
-    return res
-
-
-try:
-    if sys.argv[1].lower() == "--version" or sys.argv[1].lower() == "-v":
-        if len(sys.argv) <= 2:
-            print("1.0")
-            exit(0)
-        else:
-            print("Usage: ./jcwit.py --witness [witness_file] [list of folders]")
-        exit(0)
-
-    print("1.0")
-
-    benchmarks_dir = []
-    benchmarks_className = []
-    for i in sys.argv[3:]:
-        if i.endswith("/common") or i.endswith("/common/"):
-            continue
-        if ".java" in i:
-            benchmarks_dir.append(i)
-            benchmarks_className.append(i[0 : i.index(".java")])
-
-        else:
-            for path, subdirs, files in os.walk(i):
-                for name in files:
-                    if fnmatch(name, "*.java"):
-                        benchmarks_dir.append(os.path.join(path, name))
-                        benchmarks_className.append(name[0 : name.index(".java")])
-
-    print("benchmark: ", benchmarks_dir)
-
-    witnessFile = nx.read_graphml(sys.argv[2])
-    violation = False
-    for violationKey in witnessFile.nodes(data=True):
-        if "isViolationNode" in violationKey[1]:
-            violation = True
-except Exception as e:
-    print("Witness result: Unknown")
-    print(e)
-    exit(0)
-
-if violation == False:
-    # It is used for collate the data
-    print("Witness result: True")
-
-    types = []
-    Invariants = []
-    dict_line_assert = {}
-    graph = WitnessChecking(sys.argv[2])
-    # It is used for get the type and row number of all the invariants
-    try:
-        for index, javaFile in enumerate(benchmarks_dir):
-            dict_line_type, variableType = validation.GetType(javaFile)
-            types = types + variableType
-            Invariant = validation.GetInvariant(
-                witnessFile, benchmarks_className[index], dict_line_type
-            )
-            Invariants = Invariants + Invariant
-            dict_line_assert = Merge(dict_line_assert, graph.get_assert_dict(javaFile))
-
-        if len(types) == 0:
-            print("Witness validation: Unknown")
-            exit(0)
-
-        while len(types) != len(Invariants) and len(types) > len(Invariants):
-            Invariants.append(" ")
-
-        seed = validation.GetSeed(Invariants, types)
-
-        # Creating harness that used for running
-        validation.HarnessRunning(types, seed, len(types))
-    except Exception as e:
-        print(e)
-        DeleteFiles()
-        print("Witness validation: Unknown")
-        exit(0)
-
-    try:
-        isIntegrity = graph.CollatingData(witnessFile)
-        isDAG = graph.CreateEdgeDict(witnessFile)
-        stateResult = graph.AssertStateChecking(dict_line_assert, witnessFile)
-    except Exception as e:
-        print(e)
-        print("Witness validation: Unknown")
-        exit(0)
-    if isIntegrity == False or isDAG == False or stateResult == False:
-        print("Witness validation: False")
-        exit(0)
-
-    # Check the operating system of this machine
-    pathWin = ".;./dependencies/byte-buddy-1.14.1.jar;./dependencies/byte-buddy-agent-1.14.1.jar;./dependencies/mockito-core-5.2.0.jar;./dependencies/objenesis-3.3.jar"
-    pathLin = ".:./dependencies/byte-buddy-1.14.1.jar:./dependencies/byte-buddy-agent-1.14.1.jar:./dependencies/mockito-core-5.2.0.jar:./dependencies/objenesis-3.3.jar"
-
-    if len(benchmarks_dir) == 1:
-        cmd0 = "javac -d ./ " + benchmarks_dir[0]
-    else:
-        for benchmark in benchmarks_dir:
-            if benchmark.endswith("Main.java"):
-                cmd0 = "javac -d ./ " + benchmark
-
-    if sys.platform.startswith("linux"):
-        cmd1 = "javac -cp " + pathLin + " ValidationHarness.java"
-        cmd2 = "java -ea -cp " + pathLin + " ValidationHarness"
-    else:
-        cmd1 = "javac -cp " + pathWin + " ValidationHarness.java"
-        cmd2 = "java -ea -cp " + pathWin + " ValidationHarness"
-
-    # Rerunning the program that has been injected the harness
-    try:
-        # process0 = subprocess.Popen(cmd0, shell=True).wait()
-        process1 = subprocess.Popen(cmd1, shell=True).wait()
-        # Execute validation harness
-        process2 = subprocess.Popen(cmd2, shell=True).wait()
-    except Exception as e:
-        print("Witness validation: Unknown")
-        DeleteFiles()
-        exit(0)
-
-    if process1 != 0:
-        print("Witness validation: Unknown")
-    elif process2 != 0:
-        print("Witness validation: False")
-    else:
-        print("Witness validation: True")
-    DeleteFiles()
-
-else:
-    print(
-        "It is violation witness, the tool does not temporarily support violation validation."
+def create_argument_parser() -> argparse.ArgumentParser:
+    """
+    Creates a parser for the command-line options.
+    @return: An argparse.ArgumentParser instance
+    """
+    parser = argparse.ArgumentParser(
+        description="""
+                   Validate a given Java program with a witness conforming to the appropriate SV-COMP
+                   exchange format.
+               """,
     )
-    print("Witness result: Unknown")
-    exit(0)
+
+    parser.add_argument(
+        "benchmark", type=str, nargs="*", help="Path to the benchmark directory"
+    )
+
+    parser.add_argument(
+        "--packages",
+        dest="package_paths",
+        type=dir_path,
+        nargs="*",
+        help="Path to the packages used by the benchmark",
+    )
+
+    parser.add_argument(
+        "--witness",
+        dest="witness_file",
+        required=True,
+        type=str,
+        action="store",
+        help="Path to the witness file. Must conform to the exchange format",
+    )
+
+    parser.add_argument(
+        "--version", action="version", version="%(prog)s " + __version__
+    )
+
+    return parser
+
+
+def main():
+    parser = create_argument_parser()
+    config = parser.parse_args(sys.argv[1:])
+    config = vars(config)
+    try:
+
+        wv = WitnessValidation(config["witness_file"])
+        pv = PropertyValidation(
+            config["witness_file"], config["benchmark"], config["package_paths"]
+        )
+        mp = MonitorProcessor(config["benchmark"], config["package_paths"])
+        mp._monitor_counter_initialization()
+        mp._monitor_counter_insertion()
+
+        witness_file = wv._read_witness()
+        entry_node, edge_dict, node_arr, data_num = wv._collate_data(witness_file)
+        integrity = wv._check_integrity(entry_node, edge_dict, node_arr, data_num, 0)
+        print(integrity)
+        connectivity = wv._check_connectivity(edge_dict)
+        print(connectivity)
+        condition_dic, method_dir = pv._assertions_insertion()
+        mp._assertions_selection_insertion(condition_dic, method_dir)
+
+        vh = ValidationHarness(config["benchmark"], config["package_paths"])
+        benchmark = vh._recompile_programs()
+        vh._reverify_modified_program(benchmark)
+
+    except BaseException as err:
+        print(f"jcwit: Could not validate witness \n{err}")
+        print("Witness validation: Unknown")
+    sys.exit()
+
+
+if __name__ == "__main__":
+    main()

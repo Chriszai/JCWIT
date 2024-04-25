@@ -10,7 +10,7 @@ public class Test {
 
 class Linked {
   public static int add() {
-      Linked linked = new Linked(); MethodCallMonitor.assertionImplementation("Linked_add__I", new Linked() instanceof Linked, linked instanceof Linked);
+      Linked linked = new Linked(); MethodCallMonitor.assertionImplementation("Linked_add__I", linked instanceof Linked);
       int c = 5; MethodCallMonitor.assertionImplementation("Linked_add__I", c == 5);
       return 4;
   }
