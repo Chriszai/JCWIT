@@ -227,10 +227,13 @@ class PropertyValidation:
 
     def __extract_value_variable_name(self, java_file, witness_variable_info):
         regex = r"\b([A-Za-z_][A-Za-z0-9_]*)\s*[+\-*/%]?=[+\-*/%]?[^=;]*;"
+        method_regex = r"(\w*)\.*(.*)\((.*)\)"
+        print(witness_variable_info)
         with open(java_file, "rt") as fin:
             for row, line in enumerate(fin, 1):
                 if (witness_variable_info["startline"]) == row:
                     search_result = re.search(regex, line)
+                    method_search_result = re.search(method_regex, line)
                     if search_result is not None:
                         matches = [
                             sr for sr in search_result.groups() if sr is not None
@@ -242,6 +245,8 @@ class PropertyValidation:
                             row,
                             witness_variable_info["scope"],
                         )
+                    elif method_search_result is not None:
+                        continue
                     else:
                         raise ValueError(
                             f"The invariant fails to insert line {row} as an assertion, make sure that the Java file has been formatted."
@@ -339,7 +344,6 @@ class PropertyValidation:
         search_result = re.search(regex, scope)
         if search_result is not None:
             matches = [sr for sr in search_result.groups() if sr is not None]
-            print(matches)
             if (
                 matches[1] == "main"
                 and matches[2] == "[Ljava/lang/String;"
@@ -348,7 +352,6 @@ class PropertyValidation:
                 return True
             else:
                 counter_name = f"{matches[0]}_{matches[1]}_{matches[2].replace('[','').replace('java/lang/String','String').replace(';','')}_{matches[3].replace('[','').replace('java/lang/String','String').replace(';','')}"
-                print(counter_name)
                 self.method_counter[row] = (
                     (self.method_counter.get(row) + ", " + condition)
                     if self.method_counter.get(row)

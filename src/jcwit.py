@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import sys
 import subprocess
-import validationharness as validation
 import argparse
 from witnessvalidation import WitnessValidation
 from propertyvalidation import PropertyValidation

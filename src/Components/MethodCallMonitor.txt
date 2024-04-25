@@ -6,15 +6,7 @@ public class MethodCallMonitor {
     The method call counter will be presented as a static variable
     * */
 
-    public static void assertionImplementation (String name, boolean ... condition) {
-        try{
-            Field field = MethodCallMonitor.class.getDeclaredField(name);
-            int value = field.getInt(null);
-            assert condition[value];
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+    public static void assertionImplementation (int index, boolean ... condition) {
+        assert condition[index];
     }
 }

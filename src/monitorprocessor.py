@@ -82,7 +82,7 @@ class MonitorProcessor:
                             else f"{class_name}_{node.name}_{method_parameter}_V"
                         )
                         insert_text = (
-                            f"    public static int {str(counter_name)} = -1;\n"
+                            f"    public static int {str(counter_name)} = 0;\n"
                             + insert_text
                         )
                         for node in node.body:
@@ -95,10 +95,11 @@ class MonitorProcessor:
                                             "referenceName": node.declarators[0].name,
                                         }
                                     )
+                        self.__counter_to_count(counter_name, benchmark)
         self.__generate_monitor_file(insert_text, self.insert_line_number)
 
     def _monitor_counter_insertion(self):
-        regex = r"(\w+)\.(.*)\((.*)\)"
+        regex = r"(\w*)\.*(.*)\((.*)\)"
         for benchmark in self.benchmarks_dir:
             with open(benchmark, "rt") as fin:
                 for row, line in enumerate(fin, 1):
@@ -125,15 +126,35 @@ class MonitorProcessor:
                                     )
                 self.__class_import(benchmark)
 
+    def __counter_to_count(self, counter_name, benchmark):
+        regex = r"(\w*)\.*(.*)\((.*)\)"
+        with open(benchmark, "rt") as fin:
+            for row, line in enumerate(fin, 1):
+                search_result = re.match(regex, line)
+                if search_result is not None:
+                    counter_name_arr = counter_name.split("_")
+                    matches = [sr.strip() for sr in search_result.groups() if sr is not None]
+                    if matches[1] == counter_name_arr[1] and (
+                        len(matches[2].split(",")) == len(counter_name_arr[2])
+                        or (
+                            len(counter_name_arr[2]) == 0
+                            and len(matches[2].split(",")) == 1
+                        )
+                    ):
+                        statement = f"MethodCallMonitor.{counter_name} ++;"
+                        self.__statement_insertion(benchmark, statement, row)
+
     def _assertions_selection_insertion(self, condition_dic, method_dir):
         for key in condition_dic:
             for each in method_dir:
                 if int(each["row"]) == int(key):
                     with open(each["fileName"], "r") as f:
                         lines = f.readlines()
-                    assertion = f'MethodCallMonitor.assertionImplementation("{each["counterName"]}", {condition_dic[key]});'
-                    lines[int(key) - 1] = lines[int(key) - 1].rstrip() + " " + assertion + "\n"
-                    with open(each['fileName'], "w") as f:
+                    assertion = f'MethodCallMonitor.assertionImplementation(MethodCallMonitor.{each["counterName"]}, {condition_dic[key]});'
+                    lines[int(key) - 1] = (
+                        lines[int(key) - 1].rstrip() + " " + assertion + "\n"
+                    )
+                    with open(each["fileName"], "w") as f:
                         f.writelines(lines)
                         print(
                             f"Invariant in the {int(key)} line "

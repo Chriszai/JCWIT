@@ -6,18 +6,10 @@ public class MethodCallMonitor {
     The method call counter will be presented as a static variable
     * */
 
-    public int Linked_add__I = 0;
-    public int Test_main_LString_V = 0;
+    public static int test1_isTriangle_III_V = 0;
+    public static int test1_main_LString_V = 0;
 
-    public static void assertionImplementation (String name, boolean ... condition){
-        try {
-            MethodCallMonitor methodMonitor = new MethodCallMonitor();
-            Field field = MethodCallMonitor.class.getField(name);
-            int value = (int) field.get(methodMonitor);
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+    public static void assertionImplementation (int index, boolean ... condition) {
+        assert condition[index];
     }
 }

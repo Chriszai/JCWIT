@@ -1,4 +1,4 @@
-import org.sosy_lab.sv_benchmarks.Verifier; import Components.MethodCallMonitor;
+import org.sosy_lab.sv_benchmarks.Verifier;
 
 public class Test {
     public static void main(String[] args) {
@@ -10,8 +10,8 @@ public class Test {
 
 class Linked {
   public static int add() {
-      Linked linked = new Linked(); MethodCallMonitor.assertionImplementation("Linked_add__I", linked instanceof Linked);
-      int c = 5; MethodCallMonitor.assertionImplementation("Linked_add__I", c == 5);
+      Linked linked = new Linked();
+      int c = 5;
       return 4;
   }
 }
