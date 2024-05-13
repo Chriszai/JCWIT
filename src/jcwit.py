@@ -4,7 +4,7 @@ import subprocess
 import argparse
 from witnessvalidation import WitnessValidation
 from propertyvalidation import PropertyValidation
-from validateharness import ValidationHarness
+from validationharness import ValidationHarness
 from monitorprocessor import MonitorProcessor
 from __init__ import __version__
 

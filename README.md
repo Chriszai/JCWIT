@@ -10,15 +10,19 @@ JCWIT is a  correctness-witness validator used for validating result output by J
 
 **a. jcwit.py** - This file is the entry file and is responsible for parsing the input (witnesses), outputting the results and making calls to the relevant methods.
 
-**b. validationharness.py** - This file is responsible for the construction of the validation harness and the insertion of the validation statements, and also includes the extraction of the types of non-determined variables from the original program.
+**b. validationharness.py** - This file is responsible for building the validation harness and utilizing JBMC for validation to output the validation results..
 
-**c. graphchecking.py** - This file is responsible for checking that the CFG in the correctness witness whether covers all the behaviour of the program.
+**c. witnessvalidation.py** - This file is responsible for checking that the CFG in the correctness witness whether covers all the behaviour of the program.
 
-**d. ValidationHarnessTemplate.txt** - This file is a template for the validation harness and will be converted to a validation harness after the template statements are inserted.
+**d. monitorprocessor.py** - This file is responsible for monitoring the methods, which will assist when assertions are inserted.
+
+**e. propertyvalidation.py** - The core algorithmic file of the tool is responsible for extracting the corresponding invariants from the witnesses and integrating them into assertions, which are then injected in the appropriate places. 
+
+**f. MethodCallMonitor.java** - This java file will monitor the methods and provide support for tools to be able to selectively enforce assertions.
 
 The following diagram depicts the software architecture of JCWIT.
 
-![Image text](./IMG/JCWIT.jpg)
+![Image text](./IMG/jcwit architecture.png)
 
 # Instructions
 
@@ -48,9 +52,11 @@ Specific steps on how to use JCWIT and the third-party libraries that need to be
    • subprocess<br>
    • sys<br>
    • networkx<br>
-   • random
+   • random<br>
+   • javalang<br>
+   • subprocess
 
-   Please note that networkx needs to be installed separately; NetworkX requires Python 3.8, 3.9 or 3.10. Specific installation instructions are as follows. 
+   Please note that **networkx** and **javalang** needs to be installed separately; NetworkX requires Python 3.8, 3.9 or 3.10.  The specific installation instructions are as follows：
 
    https://www.osgeo.cn/networkx/install.html, Or you can simply install it with the Linux command:
 
@@ -58,7 +64,13 @@ Specific steps on how to use JCWIT and the third-party libraries that need to be
    pip install networkx[default]
    ```
 
-4.  JBMC supports multiple platforms including Ubantu, macOS, Windows and Docker. Different versions for different platforms can be found on the official GitHub. The GitHub link for JBMC is shown below:
+   And the Javalang package is available at https://github.com/c2nes/javalang, or you can install it with command:
+
+   ```
+   pip install javalang
+   ```
+
+4. JBMC supports multiple platforms including Ubantu, macOS and Windows and Docker. Different versions for different platforms can be found on the official GitHub. The GitHub link for JBMC is shown below:
 
    https://github.com/diffblue/cbmc/releases.
 
@@ -69,35 +81,55 @@ Specific steps on how to use JCWIT and the third-party libraries that need to be
    $ dpkg -i ubuntu-20.04-cbmc-5.95.1-Linux.deb
    ```
 
-5. (Optional) JCWIT has already provided a complete library for the Mockito framework. The specific versions are as follows:
-
-   | [byte-buddy-1.14.1.jar](https://github.com/Chriszai/JCWIT/blob/main/dependencies/byte-buddy-1.14.1.jar) |
-   | ------------------------------------------------------------ |
-   | [byte-buddy-agent-1.14.1.jar](https://github.com/Chriszai/JCWIT/blob/main/dependencies/byte-buddy-agent-1.14.1.jar) |
-   | [mockito-core-5.2.0.jar](https://github.com/Chriszai/JCWIT/blob/main/dependencies/mockito-core-5.2.0.jar) |
-   | [objenesis-3.3.jar](https://github.com/Chriszai/JCWIT/blob/main/dependencies/objenesis-3.3.jar) |
-
-   If you want to use another version of the Mockito framework, Mockito is also available to download from the following site:
-   https://mvnrepository.com/artifact/org.mockito/mockito-core.
-   Please note that you must download the other three dependencies if you want to install them separately, or just import Mockito-core if you are using a tool such as IDEA to install via Maven. These mandatory dependencies are shown below: 
-
-   • byte-buddy
-
-   • byte-buddy-agent
-
-   • objenesis
-
-   • mockito-core
-
-6. Next, use the following command to validate the selected Java file:
+5. Next, use the following command to validate the selected Java file:
 
    ```
    ./jcwit.py --witness <path-to-witnesses>/*.graphml <path-to-java-files>/*.java
    ```
+
    where the parameter *.graphml indicates the witness to be validated, and *.java indicates a series of Java programs to be validated or all Java files in
    the directory of files to be validated.
 
    ```
    ./jcwit.py --version
    ```
+
    This command is used to check the version of the script currently in use.
+
+# Outputs
+
+The verification process will output all the invariants extracted from the witnesses and print them after the invariants have been successfully injected into the program to be verified.
+
+The example java program:
+
+```java
+static void isTriangle(int a, int b, int c){
+    int x;
+    if(a > b && a > c){
+        x = a * a;
+    } else if (b > a && b > c) {
+        x = b * b;
+    } else x = c * c;
+    int y = a * a + b * b + c * c;
+    if(2 * x == y){
+        assert true;
+    } 
+    else assert false;
+}
+public static void main(String[] args) {
+    isRightTriangle(5,4,3);
+}
+```
+
+The output of example program is shown below.
+
+```
+PS E:\project\correctnessVerifier\jcwit\src> python3 jcwit.py --witness witness Test.java 
+Invariant x = 25 has been inserted as assertion in the program. SUCCESS
+Invariant y = 50 has been inserted as assertion in the program. SUCCESS
+JBMC version 5.90.0 (cbmc-5.90.0) 64-bit x86_64 windows
+
+** 0 of 37 failed (1 iterations)
+VERIFICATION SUCCESSFUL
+```
+
