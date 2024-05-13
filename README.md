@@ -22,7 +22,7 @@ JCWIT is a  correctness-witness validator used for validating result output by J
 
 The following diagram depicts the software architecture of JCWIT.
 
-![Image text](./IMG/jcwit architecture.png)
+![Image text](./IMG/jcwit.png)
 
 # Instructions
 
