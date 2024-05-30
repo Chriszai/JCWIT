@@ -85,9 +85,9 @@ def main():
         witness_file = wv._read_witness()
         entry_node, edge_dict, node_arr, data_num = wv._collate_data(witness_file)
         integrity = wv._check_integrity(entry_node, edge_dict, node_arr, data_num, 0)
-        print(integrity)
+        print("Witness integrity check completed.")
         connectivity = wv._check_connectivity(edge_dict)
-        print(connectivity)
+        print("Witness connectivity check completed.")
         condition_dic, method_dir = pv._assertions_insertion()
         mp._assertions_selection_insertion(condition_dic, method_dir)
 

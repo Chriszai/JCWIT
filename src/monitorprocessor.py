@@ -157,8 +157,8 @@ class MonitorProcessor:
                     with open(each["fileName"], "w") as f:
                         f.writelines(lines)
                         print(
-                            f"Invariant in the {int(key)} line "
-                            f"has been inserted as assertion in the program. \033[32mSUCCESS\033[0m"
+                            f"Invariant {condition_dic[key]} in file {each['fileName']} "
+                            f"has been inserted as assertion in the program at line {key}. \033[32mSUCCESS\033[0m"
                         )
                     break
 

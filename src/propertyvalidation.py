@@ -228,7 +228,6 @@ class PropertyValidation:
     def __extract_value_variable_name(self, java_file, witness_variable_info):
         regex = r"\b([A-Za-z_][A-Za-z0-9_]*)\s*[+\-*/%]?=[+\-*/%]?[^=;]*;"
         method_regex = r"(\w*)\.*(.*)\((.*)\)"
-        print(witness_variable_info)
         with open(java_file, "rt") as fin:
             for row, line in enumerate(fin, 1):
                 if (witness_variable_info["startline"]) == row:
@@ -379,8 +378,8 @@ class PropertyValidation:
             with open(java_file, "w") as f:
                 f.writelines(lines)
                 print(
-                    f"Invariant {variable_name} == {str(value)} "
-                    f"has been inserted as assertion in the program. \033[32mSUCCESS\033[0m"
+                    f"Invariant {variable_name} == {str(value)} in file {java_file}"
+                    f"has been inserted as assertion in the program at line {row}. \033[32mSUCCESS\033[0m"
                 )
 
     def __reference_invariant_insertion(
