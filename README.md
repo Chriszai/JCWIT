@@ -120,7 +120,7 @@ public static void main(String[] args) {
 }
 ```
 
-The corectness witness file of example program:
+The correctness witness file of example program:
 
 ```xml
   <graph edgedefault="directed">
