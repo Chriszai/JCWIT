@@ -91,12 +91,12 @@ class WitnessValidation:
         root = tree.getroot()
 
         # 查找目标节点
-        print(tree)
         target_node = None
         for node in root.findall(".//node"):
             node_id = node.get("id")
             if node_id == target_id:
                 target_node = node
+                print(target_node)
                 break
 
         # 如果找到目标节点，则将其移动到列表的末尾

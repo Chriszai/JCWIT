@@ -17,6 +17,7 @@ class PropertyValidation:
         self.benchmarks_fileName = []
         self.method_counter = {}
         self.monitor_dir = []
+        self.bool_dir = []
         self.benchmark_path = benchmark_path
         self.package_paths = package_paths
         self.witness_path = witness_path
@@ -52,7 +53,32 @@ class PropertyValidation:
 
         return witness_file
 
+    def __get_boolean_variable(self):
+        for benchmark in self.benchmarks_dir:
+            with open(benchmark, "r") as f:
+                java_code = f.read()
+            tree = javalang.parse.parse(java_code)
+            for path, node in tree.filter(javalang.tree.ClassDeclaration):
+                class_name = node.name
+                for node in node.body:
+                    if node.filter(javalang.tree.MethodDeclaration):
+                        method_name = node.name
+                        print(method_name)
+                        for node in node.body:
+                            if (
+                                isinstance(node, javalang.tree.LocalVariableDeclaration)
+                                and node.type.name == "boolean"
+                            ):
+                                self.bool_dir.append(
+                                    {
+                                        "className": class_name,
+                                        "methodName": method_name,
+                                        "name": node.declarators[0].name,
+                                    }
+                                )
+
     def _assertions_insertion(self):
+        self.__get_boolean_variable()
         witness_file = self.__read_witness()
         variable_property_arr = []
         class_identifier_dict = []
@@ -366,8 +392,22 @@ class PropertyValidation:
                 )
                 return False
 
+    def __replace_boolean_value(self, scope, variable_name, value):
+        regex = r"\w+::(\w+)\.(\w+):\((.*)\)(.*)"
+        result = re.search(regex, scope)
+        if result is not None:
+            matches = [sr for sr in result.groups() if sr is not None]
+        for each in self.bool_dir:
+            if (
+                each["className"] == matches[0]
+                and variable_name == each["name"]
+                and each["methodName"] == matches[1]
+            ):
+                return "false" if value == 0 else "true"
+
     def __value_invariant_insertion(self, java_file, variable_name, value, row, scope):
         regex = r"\w+::(\w+)\.(\w+):\((.*)\)(.*)"
+        value = self.__replace_boolean_value(scope, variable_name, value)
         condition = f"{variable_name} == {str(value)}"
         assertion = "assert " + variable_name + " == " + str(value) + ";"
         result = self.__condition_judgement(regex, scope, condition, row, java_file)
