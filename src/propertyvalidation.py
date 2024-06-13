@@ -16,6 +16,7 @@ class PropertyValidation:
         self.benchmarks_dir = []
         self.benchmarks_fileName = []
         self.method_counter = {}
+        self.loops = []
         self.monitor_dir = []
         self.bool_dir = []
         self.benchmark_path = benchmark_path
@@ -39,6 +40,10 @@ class PropertyValidation:
                             self.benchmarks_fileName.append(name)
 
     def __read_witness(self):
+        """
+        Witness reading and formatting of data
+        :return: The witness file that has been read.
+        """
         with open(self.witness_path, "r", encoding="utf-8") as file:
             data = file.read()
         # Check for malformed XML strings
@@ -53,7 +58,10 @@ class PropertyValidation:
 
         return witness_file
 
-    def __get_boolean_variable(self):
+    def __get_boolean_variable(self) -> None:
+        """
+        Getting variables of type boolean in the Java programs
+        """
         for benchmark in self.benchmarks_dir:
             with open(benchmark, "r") as f:
                 java_code = f.read()
@@ -63,7 +71,6 @@ class PropertyValidation:
                 for node in node.body:
                     if node.filter(javalang.tree.MethodDeclaration):
                         method_name = node.name
-                        print(method_name)
                         for node in node.body:
                             if (
                                 isinstance(node, javalang.tree.LocalVariableDeclaration)
@@ -77,8 +84,75 @@ class PropertyValidation:
                                     }
                                 )
 
-    def _assertions_insertion(self):
+    def __get_loops_positions(self) -> None:
+        """
+        Getting positions of all loops in the Java programs
+        """
+        for benchmark in self.benchmarks_dir:
+            with open(benchmark, "r") as f:
+                java_code = f.read()
+            tree = javalang.parse.parse(java_code)
+            for path, node in tree.filter(javalang.tree.ClassDeclaration):
+                class_name = node.name
+                for node in node.body:
+                    if node.filter(javalang.tree.MethodDeclaration):
+                        method_name = node.name
+                        for node in node.body:
+                            if isinstance(
+                                node,
+                                (
+                                    javalang.tree.ForStatement,
+                                    javalang.tree.WhileStatement,
+                                    javalang.tree.DoStatement,
+                                ),
+                            ):
+                                start_pos = node.position
+                                end_pos = self.__find_end_position(node, java_code)
+                                count = start_pos[0]
+                                while count <= end_pos:
+                                    self.loops.append(count)
+                                    count += 1
+
+    def __find_end_position(self, node, java_code) -> int:
+        """
+        Getting the end position of all loops in a Java program
+        :param java_code: Content of the Java program
+        :return: The position of a loop
+        """
+        # Use the position of the node to determine the range of the code it spans
+        code_lines = java_code.splitlines()
+        start_line = node.position.line - 1
+        current_line = start_line
+        open_braces = 0
+        close_braces = 0
+
+        if isinstance(node, javalang.tree.DoStatement):
+            # For do-while, we need to find the while part
+            do_start = current_line
+            while do_start < len(code_lines):
+                if "while" in code_lines[do_start]:
+                    break
+                do_start += 1
+            return do_start + 1
+
+        # Find the start of the block
+        while current_line < len(code_lines):
+            line = code_lines[current_line]
+            open_braces += line.count("{")
+            close_braces += line.count("}")
+            if open_braces > 0 and open_braces == close_braces:
+                break
+            current_line += 1
+
+        return current_line + 1
+
+    def _assertions_insertion(self) -> (list,list):
+        """
+        Extracting and inserting all of the assertions into the source programs
+        :retrun: Two arrays containing the method counters and the monitored methods
+        """
         self.__get_boolean_variable()
+        self.__get_loops_positions()
         witness_file = self.__read_witness()
         variable_property_arr = []
         class_identifier_dict = []
@@ -97,6 +171,7 @@ class PropertyValidation:
                 lambda edge: (
                     local_variable[0] == edge[1]
                     and edge[2]["originFileName"] != self.EXCLUDED_FILE_NAME
+                    and edge[2]["startline"] not in self.loops
                 ),
                 witness_file.edges(data=True),
             ):
@@ -199,13 +274,20 @@ class PropertyValidation:
         return self.method_counter, self.monitor_dir
 
     @staticmethod
-    def __value_variable_array_form(search_result, variable_edge, scope):
+    def __value_variable_array_form(search_result, variable_edge, scope) -> dict:
+        """
+        Constructs arrays that include all value variable types
+        :param search_result: Result after regular expression matching
+        :param variable_edge: Information on the edge of the corresponding variable in the witness
+        :param scope: Scope of the variable
+        :retrun: A dictionary contains all the information about the invariant to be asserted
+        """
         matches = [sr for sr in search_result.groups() if sr is not None]
         search_result = re.search(r"(\d+\.\d+)", matches[1])
         value = int(matches[1]) if search_result is None else float(matches[1])
         return {**variable_edge, "type": matches[0], "value": value, "scope": scope}
 
-    def __read_index_of_program(self, witness_variable_info):
+    def __read_index_of_program(self, witness_variable_info) -> int:
         if witness_variable_info["originFileName"]:
             try:
                 index = self.benchmarks_fileName.index(
@@ -217,7 +299,7 @@ class PropertyValidation:
                 ) from exc
         return index if index else -1
 
-    def __extract_string_variable_name(self, witness_variable_info):
+    def __extract_string_variable_name(self, witness_variable_info) -> None:
         index = self.__read_index_of_program(witness_variable_info)
         regex = r"\b([A-Za-z_][A-Za-z0-9_]*)\s*[+\-*/%]?=[+\-*/%]?[^=;]*;"
         with open(self.benchmarks_dir[index], "rt") as fin:
@@ -236,7 +318,7 @@ class PropertyValidation:
                             witness_variable_info["scope"],
                         )
 
-    def __value_type_file_match(self, variable_property_arr):
+    def __value_type_file_match(self, variable_property_arr) -> None:
         for witness_variable_info in variable_property_arr:
             if witness_variable_info["originFileName"]:
                 try:
@@ -251,13 +333,18 @@ class PropertyValidation:
                     self.benchmarks_dir[index], witness_variable_info
                 )
 
-    def __extract_value_variable_name(self, java_file, witness_variable_info):
+    def __extract_value_variable_name(self, java_file, witness_variable_info) -> None:
         regex = r"\b([A-Za-z_][A-Za-z0-9_]*)\s*[+\-*/%]?=[+\-*/%]?[^=;]*;"
         method_regex = r"(\w*)\.*(.*)\((.*)\)"
         with open(java_file, "rt") as fin:
             for row, line in enumerate(fin, 1):
                 if (witness_variable_info["startline"]) == row:
                     search_result = re.search(regex, line)
+                    search_result2 = re.search(
+                        r"\+\+([a-zA-Z_][a-zA-Z0-9_]*)|([a-zA-Z_][a-zA-Z0-9_]*)\+\+|--([a-zA-Z_][a-zA-Z0-9_]*)|([a-zA-Z_][a-zA-Z0-9_]*)--",
+                        line,
+                    )
+                    search_result = search_result if search_result is not None else search_result2
                     method_search_result = re.search(method_regex, line)
                     if search_result is not None:
                         matches = [
@@ -397,13 +484,14 @@ class PropertyValidation:
         result = re.search(regex, scope)
         if result is not None:
             matches = [sr for sr in result.groups() if sr is not None]
-        for each in self.bool_dir:
-            if (
-                each["className"] == matches[0]
-                and variable_name == each["name"]
-                and each["methodName"] == matches[1]
-            ):
-                return "false" if value == 0 else "true"
+            for each in self.bool_dir:
+                if (
+                    each["className"] == matches[0]
+                    and variable_name == each["name"]
+                    and each["methodName"] == matches[1]
+                ):
+                    return "false" if value == 0 else "true"
+        return value
 
     def __value_invariant_insertion(self, java_file, variable_name, value, row, scope):
         regex = r"\w+::(\w+)\.(\w+):\((.*)\)(.*)"

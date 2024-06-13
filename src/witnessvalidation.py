@@ -9,7 +9,7 @@ class WitnessValidation:
         self.witness_path = witness_path
 
     def _read_witness(self):
-        self.move_node_to_end(self.witness_path, "sink")
+        self._move_node_to_end(self.witness_path, "sink")
         with open(self.witness_path, "r", encoding="utf-8") as file:
             data = file.read()
         # Check for malformed XML strings
@@ -85,25 +85,24 @@ class WitnessValidation:
 
         return len(Seq) == len(in_degrees)
 
-    def move_node_to_end(self, xml_file, target_id):
-        # 解析XML文件
+    def _move_node_to_end(self, xml_file, target_id):
+        # Parsing XML files
         tree = ET.parse(xml_file)
         root = tree.getroot()
-
-        # 查找目标节点
+        # Find target node
         target_node = None
-        for node in root.findall(".//node"):
+        nodes = root.findall(".//{http://graphml.graphdrawing.org/xmlns}node")
+        parent = root.find(".//{http://graphml.graphdrawing.org/xmlns}graph")
+        for node in nodes:
             node_id = node.get("id")
             if node_id == target_id:
                 target_node = node
                 print(target_node)
                 break
 
-        # 如果找到目标节点，则将其移动到列表的末尾
+        # If the target node is found, move it to the end of the list
         if target_node is not None:
-            parent = target_node.getparent()
             parent.remove(target_node)
             parent.append(target_node)
-
-            # 保存更改后的XML文件
+            # Save the changed XML file
             tree.write(xml_file)

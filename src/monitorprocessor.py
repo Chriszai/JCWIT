@@ -12,6 +12,7 @@ class MonitorProcessor:
     insert_line_number = 8
     FORMAT = "MethodCallMonitor.assertionImplementation();"
     CLASS_NAME = "MethodCallMonitor"
+    IMPORT_NAME = " import Components.MethodCallMonitor;"
     CONVERSION_DICT = {
         "int": "I",
         "double": "D",
@@ -133,7 +134,9 @@ class MonitorProcessor:
                 search_result = re.match(regex, line)
                 if search_result is not None:
                     counter_name_arr = counter_name.split("_")
-                    matches = [sr.strip() for sr in search_result.groups() if sr is not None]
+                    matches = [
+                        sr.strip() for sr in search_result.groups() if sr is not None
+                    ]
                     if matches[1] == counter_name_arr[1] and (
                         len(matches[2].split(",")) == len(counter_name_arr[2])
                         or (
@@ -162,11 +165,14 @@ class MonitorProcessor:
                         )
                     break
 
-    @staticmethod
-    def __class_import(benchmark):
+    def __class_import(self, benchmark):
         with open(benchmark, "rt") as f:
             lines = f.readlines()
-        lines[0] = lines[0].rstrip() + f" import Components.MethodCallMonitor;" + "\n"
+        lines[0] = (
+            lines[0].rstrip() + self.IMPORT_NAME + "\n"
+            if self.IMPORT_NAME not in lines[0]
+            else lines[0]
+        )
         with open(benchmark, "w") as f:
             f.writelines(lines)
 
