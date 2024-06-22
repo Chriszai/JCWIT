@@ -43,7 +43,11 @@ class ValidationHarness:
             proc.wait()
         return proc
 
-    def _recompile_programs(self):
+    def _recompile_programs(self) -> str:
+        """
+        Recomiles the transformed program
+        :return: Name of the transformed program
+        """
         for benchmark in self.benchmarks_fileName:
             if benchmark.endswith("Main.java"):
                 cmd = [
@@ -72,15 +76,9 @@ class ValidationHarness:
         else:
             raise ValueError("Input file path does not end with '.java'")
 
-    def _reverify_modified_program(self, benchmark):
+    def _reverify_modified_program(self, benchmark) -> None:
+        """
+        Reverify the transformed program
+        """
         cmd = ["jbmc", benchmark]
         proc = self.__run_command(cmd)
-        # out = proc.stdout.read()
-        # err = proc.stderr.read()
-        # out = err if err else out
-        # if "VERIFICATION SUCCESSFUL" in out:
-        #     print("Witness validation: True")
-        # elif "VERIFICATION FAILED" in out:
-        #     print("Witness validation: False")
-        # else:
-        #     print("Witness validation: Unknown")

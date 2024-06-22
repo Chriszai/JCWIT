@@ -9,6 +9,10 @@ class WitnessValidation:
         self.witness_path = witness_path
 
     def _read_witness(self):
+        """
+        Witness reading and formatting of data
+        :return: The witness file that has been read.
+        """
         self._move_node_to_end(self.witness_path, "sink")
         with open(self.witness_path, "r", encoding="utf-8") as file:
             data = file.read()
@@ -24,7 +28,15 @@ class WitnessValidation:
 
         return witness_file
 
-    def _collate_data(self, file) -> (str, dict, int, list):
+    def _collate_data(self, file) -> (str, dict, list, int):
+        """
+        Collate witness data to meet subsequent checks for completeness and connectivity.
+        :param file: The witness file that has been read.
+        :return entry_node: Initial nodes in correctness witness
+        :return edge_dict: A dict consisting of individual edges in a witness
+        :return node_arr: A arr consisting of individual nodes in a witness
+        :return data_num: Number of nodes in the correctness witness
+        """
         # Collating data from witnesses
         edge_dict = {}
         data_num = 0
@@ -50,6 +62,16 @@ class WitnessValidation:
     def _check_integrity(
         self, node: str, edge_dict: dict, node_arr: list, num: int, cur: int
     ) -> bool:
+        """
+        Checking the integrity of witnesses
+        :param file: The witness file that has been read.
+        :param node: Node to be verified
+        :param edge_dict: A dict consisting of individual edges in a witness
+        :param node_arr: A arr consisting of individual nodes in a witness
+        :param num: Number of nodes in the correctness witness
+        :param cur: Current node
+        :return: outcome of verification of integrity
+        """
         if node in edge_dict and node in node_arr:
             val = edge_dict[node]
 
@@ -65,6 +87,11 @@ class WitnessValidation:
         return cur == num
 
     def _check_connectivity(self, graph: dict) -> bool:
+        """
+        Checking the connectivity of witnesses
+        :param graph: Graph derived from witnesses
+        :return: outcome of verification of connectivity
+        """
         in_degrees = dict((u, 0) for u in graph)
         # Initialise all vertex incidence to 0
         for u in graph:
@@ -85,7 +112,12 @@ class WitnessValidation:
 
         return len(Seq) == len(in_degrees)
 
-    def _move_node_to_end(self, xml_file, target_id):
+    def _move_node_to_end(self, xml_file, target_id) -> None:
+        """
+        Move the sink node to the end
+        :param xml_file: Witness
+        :param target_id: Id of target node
+        """
         # Parsing XML files
         tree = ET.parse(xml_file)
         root = tree.getroot()

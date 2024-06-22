@@ -146,7 +146,7 @@ class PropertyValidation:
 
         return current_line + 1
 
-    def _assertions_insertion(self) -> (list,list):
+    def _assertions_insertion(self) -> (list, list):
         """
         Extracting and inserting all of the assertions into the source programs
         :retrun: Two arrays containing the method counters and the monitored methods
@@ -288,6 +288,11 @@ class PropertyValidation:
         return {**variable_edge, "type": matches[0], "value": value, "scope": scope}
 
     def __read_index_of_program(self, witness_variable_info) -> int:
+        """
+        Retrieve the index of the file being processed in the file array
+        :param witness_variable_info: Information on invariant being processed in the witness
+        :retrun: The index of the program
+        """
         if witness_variable_info["originFileName"]:
             try:
                 index = self.benchmarks_fileName.index(
@@ -299,7 +304,11 @@ class PropertyValidation:
                 ) from exc
         return index if index else -1
 
-    def __extract_string_variable_name(self, witness_variable_info) -> None:
+    def __extract_string_variable_name(self, witness_variable_info: dict) -> None:
+        """
+        Extracts the name of a variable of type string
+        :param witness_variable_info: Information on invariant being processed in the witness
+        """
         index = self.__read_index_of_program(witness_variable_info)
         regex = r"\b([A-Za-z_][A-Za-z0-9_]*)\s*[+\-*/%]?=[+\-*/%]?[^=;]*;"
         with open(self.benchmarks_dir[index], "rt") as fin:
@@ -318,7 +327,7 @@ class PropertyValidation:
                             witness_variable_info["scope"],
                         )
 
-    def __value_type_file_match(self, variable_property_arr) -> None:
+    def __value_type_file_match(self, variable_property_arr: list) -> None:
         for witness_variable_info in variable_property_arr:
             if witness_variable_info["originFileName"]:
                 try:
@@ -334,6 +343,11 @@ class PropertyValidation:
                 )
 
     def __extract_value_variable_name(self, java_file, witness_variable_info) -> None:
+        """
+        Extracts the name of a variable of value-type
+        :param java_file: The java file to which the variable belongs
+        :param witness_variable_info: Information on invariant being processed in the witness
+        """
         regex = r"\b([A-Za-z_][A-Za-z0-9_]*)\s*[+\-*/%]?=[+\-*/%]?[^=;]*;"
         method_regex = r"(\w*)\.*(.*)\((.*)\)"
         with open(java_file, "rt") as fin:
@@ -344,7 +358,9 @@ class PropertyValidation:
                         r"\+\+([a-zA-Z_][a-zA-Z0-9_]*)|([a-zA-Z_][a-zA-Z0-9_]*)\+\+|--([a-zA-Z_][a-zA-Z0-9_]*)|([a-zA-Z_][a-zA-Z0-9_]*)--",
                         line,
                     )
-                    search_result = search_result if search_result is not None else search_result2
+                    search_result = (
+                        search_result if search_result is not None else search_result2
+                    )
                     method_search_result = re.search(method_regex, line)
                     if search_result is not None:
                         matches = [
@@ -364,7 +380,11 @@ class PropertyValidation:
                             f"The invariant fails to insert line {row} as an assertion, make sure that the Java file has been formatted."
                         )
 
-    def __extract_reference_variable_name(self, witness_variable_info):
+    def __extract_reference_variable_name(self, witness_variable_info) -> None:
+        """
+        Extracts the name of a variable of reference-type
+        :param witness_variable_info: Information on invariant being processed in the witness
+        """
         index = self.__read_index_of_program(witness_variable_info)
         regex1 = r"\w+\s+(\w+)\s*=\s*new\s+([\w.]+)\((.*)\);"
         regex2 = r"\s*new\s+([\w.]+)\((.*)\);"
@@ -396,6 +416,11 @@ class PropertyValidation:
                         )
 
     def __object_variable_matching(self, witness_variable_info, class_identifier_arr):
+        """
+        Match the reference to which the object refers
+        :param witness_variable_info: Information on invariant being processed in the witness
+        :param class_identifier_arr: Array of class identifiers in the Java programs
+        """
         index = self.__read_index_of_program(witness_variable_info)
         with open(self.benchmarks_dir[index], "rt") as fin:
             for row, line in enumerate(fin, 1):
@@ -447,6 +472,15 @@ class PropertyValidation:
                                     return
 
     def __condition_judgement(self, regex, scope, condition, row, java_file):
+        """
+        Determines if the current invariant is in the main method, if so returns true, otherwise returns false
+        :param regex: The regular expression applied to the scope of the current invariant
+        :param scope: The predicate formed by the current invariant
+        :param condition: The scope of the current invariant
+        :param row: The line number of the current invariant
+        :param java_file: The java file to which the current invariant belongs
+        :return: Result of conditional judgment
+        """
         if "Main.java" in self.benchmarks_fileName:
             file_name = "Main"
         else:
@@ -480,6 +514,13 @@ class PropertyValidation:
                 return False
 
     def __replace_boolean_value(self, scope, variable_name, value):
+        """
+        Replaces the value of the boolean type in the assertion, where 1 is replaced with true and 0 is replaced with false.
+        :param scope: The predicate formed by the current invariant
+        :param variable_name: The name of the variable of type boolean in the assertion being replaced,
+        :param value: The value in the current invariant
+        :return: true or false
+        """
         regex = r"\w+::(\w+)\.(\w+):\((.*)\)(.*)"
         result = re.search(regex, scope)
         if result is not None:
@@ -493,7 +534,17 @@ class PropertyValidation:
                     return "false" if value == 0 else "true"
         return value
 
-    def __value_invariant_insertion(self, java_file, variable_name, value, row, scope):
+    def __value_invariant_insertion(
+        self, java_file, variable_name, value, row, scope
+    ) -> None:
+        """
+        Insertion the value-type invariant in the form of assertion into the program to be validated
+        :param java_file: The java file to which the current invariant belongs
+        :param variable_name: The name of the variable of type boolean in the assertion being replaced,
+        :param value: The value in the current invariant
+        :param row: The line number of the current invariant in the java program
+        :param scope: The predicate formed by the current invariant
+        """
         regex = r"\w+::(\w+)\.(\w+):\((.*)\)(.*)"
         value = self.__replace_boolean_value(scope, variable_name, value)
         condition = f"{variable_name} == {str(value)}"
@@ -512,7 +563,14 @@ class PropertyValidation:
 
     def __reference_invariant_insertion(
         self, java_file, matches, witness_variable_info, row
-    ):
+    ) -> None:
+        """
+        Insertion the reference-type invariant in the form of assertion into the program to be validated
+        :param java_file: The java file to which the current invariant belongs
+        :param matches: An array containing information about the current variable
+        :param witness_variable_info: Information on invariant being processed in the witness
+        :param row: The line number of the current invariant in the java program
+        """
         regex = r"\w+::(\w+)\.(\w+):\((.*)\)(.*)"
         if "className" in witness_variable_info:
             condition = "new {0}({1}) instanceof {2}".format(

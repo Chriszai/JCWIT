@@ -48,7 +48,10 @@ class MonitorProcessor:
                             self.benchmarks_dir.append(os.path.join(path, name))
                             self.benchmarks_fileName.append(name)
 
-    def _monitor_counter_initialization(self):
+    def _monitor_counter_initialization(self) -> None:
+        """
+        Method Monitor Initialization
+        """
         insert_text = ""
         for benchmark in self.benchmarks_dir:
             with open(benchmark, "r") as f:
@@ -99,7 +102,10 @@ class MonitorProcessor:
                         self.__counter_to_count(counter_name, benchmark)
         self.__generate_monitor_file(insert_text, self.insert_line_number)
 
-    def _monitor_counter_insertion(self):
+    def _monitor_counter_insertion(self) -> None:
+        """
+        Inserting a Method Counter in the Method Monitor
+        """
         regex = r"(\w*)\.*(.*)\((.*)\)"
         for benchmark in self.benchmarks_dir:
             with open(benchmark, "rt") as fin:
@@ -127,7 +133,12 @@ class MonitorProcessor:
                                     )
                 self.__class_import(benchmark)
 
-    def __counter_to_count(self, counter_name, benchmark):
+    def __counter_to_count(self, counter_name: str, benchmark: list):
+        """
+        Counting with method counters
+        :param counter_name: Name of counter
+        :param benchmark: The current java file being excuted
+        """
         regex = r"(\w*)\.*(.*)\((.*)\)"
         with open(benchmark, "rt") as fin:
             for row, line in enumerate(fin, 1):
@@ -147,7 +158,14 @@ class MonitorProcessor:
                         statement = f"MethodCallMonitor.{counter_name} ++;"
                         self.__statement_insertion(benchmark, statement, row)
 
-    def _assertions_selection_insertion(self, condition_dic, method_dir):
+    def _assertions_selection_insertion(
+        self, condition_dic: dict, method_dir: dict
+    ) -> None:
+        """
+        Inserting assertion selection method into the program
+        :param condition_dic: predicate that needs to be asserted
+        :param method_dir: List of methods
+        """
         for key in condition_dic:
             for each in method_dir:
                 if int(each["row"]) == int(key):
@@ -165,7 +183,11 @@ class MonitorProcessor:
                         )
                     break
 
-    def __class_import(self, benchmark):
+    def __class_import(self, benchmark) -> None:
+        """
+        Import the class of method monitor
+        :param benchmark: The current java file being excuted
+        """
         with open(benchmark, "rt") as f:
             lines = f.readlines()
         lines[0] = (
@@ -177,7 +199,12 @@ class MonitorProcessor:
             f.writelines(lines)
 
     @staticmethod
-    def __statement_insertion(benchmark, statement, row):
+    def __statement_insertion(benchmark: str, statement: str, row) -> None:
+        """
+        Insert the statement into the program
+        :param benchmark: The current java file being excuted
+        :param statement: The statement needs to be inserted
+        """
         with open(benchmark, "r") as f:
             lines = f.readlines()
         lines[row - 1] = lines[row - 1].rstrip() + " " + statement + "\n"
@@ -185,7 +212,12 @@ class MonitorProcessor:
             f.writelines(lines)
 
     @staticmethod
-    def __generate_monitor_file(insert_text, insert_line_number):
+    def __generate_monitor_file(insert_text: str, insert_line_number: int) -> None:
+        """
+        Generate method monitor class
+        :param insert_text: The text needs to be inserted
+        :param insert_line_number: The line number where the text is located
+        """
         with open("./Components/MethodCallMonitor.txt", "rt") as file:
             lines = file.readlines()
         lines.insert(insert_line_number, insert_text + "\n")
