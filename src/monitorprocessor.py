@@ -188,15 +188,44 @@ class MonitorProcessor:
         Import the class of method monitor
         :param benchmark: The current java file being excuted
         """
+        index = self.find_first_code_line_number(benchmark)
         with open(benchmark, "rt") as f:
             lines = f.readlines()
-        lines[0] = (
-            lines[0].rstrip() + self.IMPORT_NAME + "\n"
-            if self.IMPORT_NAME not in lines[0]
-            else lines[0]
+        lines[index] = (
+            lines[index].rstrip() + self.IMPORT_NAME + "\n"
+            if self.IMPORT_NAME not in lines[index]
+            else lines[index]
         )
         with open(benchmark, "w") as f:
             f.writelines(lines)
+    
+    def find_first_code_line_number(self, file_path):
+        multi_line_comment = False
+        single_line_comment_pattern = re.compile(r'^\s*//')
+        multi_line_comment_start_pattern = re.compile(r'^\s*/\*')
+        multi_line_comment_end_pattern = re.compile(r'\*/\s*$')
+
+        with open(file_path, 'r') as file:
+            for line_number, line in enumerate(file, start=0):
+                stripped_line = line.strip()
+                # Check for single-line comment
+                if single_line_comment_pattern.match(stripped_line):
+                    continue
+                # Check for multi-line comment start
+                if multi_line_comment_start_pattern.match(stripped_line):
+                    multi_line_comment = True
+                    continue
+                # Check for multi-line comment end
+                if multi_line_comment and multi_line_comment_end_pattern.search(stripped_line):
+                    multi_line_comment = False
+                    continue
+                # Skip lines within multi-line comments
+                if multi_line_comment:
+                    continue
+                # Check if the line is not empty and not a comment
+                if stripped_line:
+                    return line_number
+        return 0
 
     @staticmethod
     def __statement_insertion(benchmark: str, statement: str, row) -> None:

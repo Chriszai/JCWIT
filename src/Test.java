@@ -1,4 +1,4 @@
-import org.sosy_lab.sv_benchmarks.Verifier; import Components.MethodCallMonitor;
+import org.sosy_lab.sv_benchmarks.Verifier;
 
 class Test {
     static void isRightTriangle(int a, int b, int c){
@@ -14,7 +14,6 @@ class Test {
        }
        else assert false;
     }
-
     public static void main(String[] args) {
        isRightTriangle(5,4,3);
     }

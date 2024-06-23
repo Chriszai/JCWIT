@@ -519,7 +519,7 @@ class PropertyValidation:
         :param scope: The predicate formed by the current invariant
         :param variable_name: The name of the variable of type boolean in the assertion being replaced,
         :param value: The value in the current invariant
-        :return: true or false
+        :return: Whether the replacement is successful or not
         """
         regex = r"\w+::(\w+)\.(\w+):\((.*)\)(.*)"
         result = re.search(regex, scope)
