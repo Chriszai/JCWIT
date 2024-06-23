@@ -273,6 +273,8 @@ VERIFICATION SUCCESSFUL
 The modified example java program is shown below:
 
 ```java
+import Components.MethodCallMonitor;
+
 static void isTriangle(int a, int b, int c){
     int x;
     if(a > b && a > c){
@@ -291,3 +293,21 @@ public static void main(String[] args) {
 }
 ```
 
+Method Monitor for example program.
+
+```java
+package Components;
+
+public class MethodCallMonitor {
+    /*
+    The method call counter will be presented as a static variable
+    * */
+
+    public static int Test_main_LString_V = 0;
+    public static int Test_isRightTriangle_III_V = 0;
+
+    public static void assertionImplementation (int index, boolean ... condition) {
+        assert condition[index];
+    }
+}
+```
