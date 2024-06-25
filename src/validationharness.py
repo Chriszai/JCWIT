@@ -1,14 +1,18 @@
+#!/usr/bin/env python3
+
 import os
 import re
 from fnmatch import fnmatch
 import networkx as nx
 import javalang
 import subprocess
+import sys
 
 
 class ValidationHarness:
 
     VERIFIER_PACKAGE = ".;%JAVA_HOME%\lib;./org/sosy_lab/sv_benchmarks"
+    VERIFIER_PACKAGE_LINUX = ".:%JAVA_HOME%\lib:./org/sosy_lab/sv_benchmarks"
 
     def __init__(self, benchmark_path, package_paths):
         self.benchmarks_dir = []
@@ -48,6 +52,7 @@ class ValidationHarness:
         Recomiles the transformed program
         :return: Name of the transformed program
         """
+        self.VERIFIER_PACKAGE = self.VERIFIER_PACKAGE_LINUX if sys.platform.startswith("linux") else self.VERIFIER_PACKAGE
         for benchmark in self.benchmarks_fileName:
             if benchmark.endswith("Main.java"):
                 cmd = [

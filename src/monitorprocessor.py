@@ -188,7 +188,7 @@ class MonitorProcessor:
         Import the class of method monitor
         :param benchmark: The current java file being excuted
         """
-        index = self.find_first_code_line_number(benchmark)
+        index = self.__find_first_code_line_number(benchmark)
         with open(benchmark, "rt") as f:
             lines = f.readlines()
         lines[index] = (
@@ -199,7 +199,7 @@ class MonitorProcessor:
         with open(benchmark, "w") as f:
             f.writelines(lines)
     
-    def find_first_code_line_number(self, file_path):
+    def __find_first_code_line_number(self, file_path):
         multi_line_comment = False
         single_line_comment_pattern = re.compile(r'^\s*//')
         multi_line_comment_start_pattern = re.compile(r'^\s*/\*')
