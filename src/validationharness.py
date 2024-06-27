@@ -11,8 +11,8 @@ import sys
 
 class ValidationHarness:
 
-    VERIFIER_PACKAGE = ".;%JAVA_HOME%\lib;./org/sosy_lab/sv_benchmarks"
-    VERIFIER_PACKAGE_LINUX = ".:%JAVA_HOME%\lib:./org/sosy_lab/sv_benchmarks"
+    VERIFIER_PACKAGE = [".", "%JAVA_HOME%\lib", "./org/sosy_lab/sv_benchmarks"]
+    VERIFIER_PACKAGE_LINUX = [".", "%JAVA_HOME%\lib", "./org/sosy_lab/sv_benchmarks"]
 
     def __init__(self, benchmark_path, package_paths):
         self.benchmarks_dir = []
@@ -47,23 +47,43 @@ class ValidationHarness:
             proc.wait()
         return proc
 
-    def __extract_before_last_slash(self, input_str):
-        symbol = ":" if sys.platform.startswith("linux") else ";"
-        if '/' in input_str:
-            last_slash_index = input_str.rfind('/')
-            return symbol + input_str[:last_slash_index + 1]
+    def __extract_before_last_slash(self, input_str) -> str:
+        """
+        Extracts a string that can be used as a class path
+        :param input_str: String that is being manipulated
+        :return: Extracted string
+        """
+        if input_str.endswith(".java"):
+            last_forward_slash = input_str.rfind('/')
+            last_backward_slash = input_str.rfind('\\')
+            if max(last_forward_slash, last_backward_slash) != -1 :
+                return input_str[:max(last_forward_slash, last_backward_slash)]
+            else:
+                return ""
         else:
-            return ""
+            return input_str
 
     def _recompile_programs(self) -> str:
         """
         Recomiles the transformed program
         :return: Name of the transformed program
         """
-        self.VERIFIER_PACKAGE = self.VERIFIER_PACKAGE_LINUX if sys.platform.startswith("linux") else self.VERIFIER_PACKAGE
+        self.VERIFIER_PACKAGE = (
+            self.VERIFIER_PACKAGE_LINUX
+            if sys.platform.startswith("linux")
+            else self.VERIFIER_PACKAGE
+        )
+
+        for index, benchmark in enumerate(self.benchmark_path):
+            if self.__extract_before_last_slash(benchmark) in self.VERIFIER_PACKAGE:
+                continue
+            else:
+                self.VERIFIER_PACKAGE.append(self.__extract_before_last_slash(benchmark))
+
+        symbol = ":" if sys.platform.startswith("linux") else ";"
+        self.VERIFIER_PACKAGE = symbol.join(self.VERIFIER_PACKAGE)
 
         for index, benchmark in enumerate(self.benchmarks_dir):
-            self.VERIFIER_PACKAGE = self.VERIFIER_PACKAGE + self.__extract_before_last_slash(benchmark)
             if benchmark.endswith("Main.java"):
                 cmd = [
                     "javac",
@@ -73,7 +93,7 @@ class ValidationHarness:
                     "./",
                     benchmark,
                 ]
-                class_name = self.benchmarks_dir[index]
+                class_name = self.benchmarks_fileName[index]
                 break
             else:
                 cmd = [
@@ -84,7 +104,7 @@ class ValidationHarness:
                     "./",
                     self.benchmarks_dir[0],
                 ]
-                class_name = self.benchmarks_dir[0]
+                class_name = self.benchmarks_fileName[0]
         proc = self.__run_command(cmd)
         if class_name.endswith(".java"):
             return class_name.replace(".java", "")

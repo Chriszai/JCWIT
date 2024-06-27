@@ -44,7 +44,7 @@ Specific steps on how to use JCWIT and the third-party libraries that need to be
    If you want to install a specific version of Python, add the specific version after "Python", for example:
 
    ```
-   $ sudo apt-get install python3.8
+   $ sudo apt-get install python3.10
    ```
 
 3. The additional third-party packages required by this Python script are as follows (mandatory):<br>

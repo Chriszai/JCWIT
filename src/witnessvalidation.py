@@ -129,7 +129,6 @@ class WitnessValidation:
             node_id = node.get("id")
             if node_id == target_id:
                 target_node = node
-                print(target_node)
                 break
 
         # If the target node is found, move it to the end of the list

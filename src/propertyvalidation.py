@@ -293,7 +293,7 @@ class PropertyValidation:
         :param witness_variable_info: Information on invariant being processed in the witness
         :retrun: The index of the program
         """
-        if witness_variable_info["originFileName"]:
+        if witness_variable_info["originFileName"] and witness_variable_info["originFileName"] in self.benchmarks_fileName:
             try:
                 index = self.benchmarks_fileName.index(
                     witness_variable_info["originFileName"]
@@ -310,26 +310,27 @@ class PropertyValidation:
         :param witness_variable_info: Information on invariant being processed in the witness
         """
         index = self.__read_index_of_program(witness_variable_info)
-        regex = r"\b([A-Za-z_][A-Za-z0-9_]*)\s*[+\-*/%]?=[+\-*/%]?[^=;]*;"
-        with open(self.benchmarks_dir[index], "rt") as fin:
-            for row, line in enumerate(fin, 1):
-                if (witness_variable_info["startline"]) == row:
-                    search_result = re.search(regex, line)
-                    if search_result is not None:
-                        matches = [
-                            sr for sr in search_result.groups() if sr is not None
-                        ]
-                        self.__value_invariant_insertion(
-                            self.benchmarks_dir[index],
-                            matches[0],
-                            f'"{witness_variable_info["value"]}"',
-                            row,
-                            witness_variable_info,
-                        )
+        if index >= 0:
+            regex = r"\b([A-Za-z_][A-Za-z0-9_]*)\s*[+\-*/%]?=[+\-*/%]?[^=;]*;"
+            with open(self.benchmarks_dir[index], "rt") as fin:
+                for row, line in enumerate(fin, 1):
+                    if (witness_variable_info["startline"]) == row:
+                        search_result = re.search(regex, line)
+                        if search_result is not None:
+                            matches = [
+                                sr for sr in search_result.groups() if sr is not None
+                            ]
+                            self.__value_invariant_insertion(
+                                self.benchmarks_dir[index],
+                                matches[0],
+                                f'"{witness_variable_info["value"]}"',
+                                row,
+                                witness_variable_info,
+                            )
 
     def __value_type_file_match(self, variable_property_arr: list) -> None:
         for witness_variable_info in variable_property_arr:
-            if witness_variable_info["originFileName"]:
+            if witness_variable_info["originFileName"] and witness_variable_info["originFileName"] in self.benchmarks_fileName:
                 try:
                     index = self.benchmarks_fileName.index(
                         witness_variable_info["originFileName"]
@@ -386,34 +387,35 @@ class PropertyValidation:
         :param witness_variable_info: Information on invariant being processed in the witness
         """
         index = self.__read_index_of_program(witness_variable_info)
-        regex1 = r"\w+\s+(\w+)\s*=\s*new\s+([\w.]+)\((.*)\);"
-        regex2 = r"\s*new\s+([\w.]+)\((.*)\);"
-        with open(self.benchmarks_dir[index], "rt") as fin:
-            for row, line in enumerate(fin, 1):
-                if (witness_variable_info["startline"]) == row:
-                    search_result = re.search(regex1, line)
-                    if search_result is not None:
-                        matches = [
-                            sr for sr in search_result.groups() if sr is not None
-                        ]
-                        self.__reference_invariant_insertion(
-                            self.benchmarks_dir[index],
-                            matches if len(matches) >= 3 else [None, *matches],
-                            witness_variable_info,
-                            row,
-                        )
-                        return
-                    search_result = re.search(regex2, line)
-                    if search_result is not None:
-                        matches = [
-                            sr for sr in search_result.groups() if sr is not None
-                        ]
-                        self.__reference_invariant_insertion(
-                            self.benchmarks_dir[index],
-                            matches if len(matches) >= 3 else [None, *matches],
-                            witness_variable_info,
-                            row,
-                        )
+        if index >=0:
+            regex1 = r"\w+\s+(\w+)\s*=\s*new\s+([\w.]+)\((.*)\);"
+            regex2 = r"\s*new\s+([\w.]+)\((.*)\);"
+            with open(self.benchmarks_dir[index], "rt") as fin:
+                for row, line in enumerate(fin, 1):
+                    if (witness_variable_info["startline"]) == row:
+                        search_result = re.search(regex1, line)
+                        if search_result is not None:
+                            matches = [
+                                sr for sr in search_result.groups() if sr is not None
+                            ]
+                            self.__reference_invariant_insertion(
+                                self.benchmarks_dir[index],
+                                matches if len(matches) >= 3 else [None, *matches],
+                                witness_variable_info,
+                                row,
+                            )
+                            return
+                        search_result = re.search(regex2, line)
+                        if search_result is not None:
+                            matches = [
+                                sr for sr in search_result.groups() if sr is not None
+                            ]
+                            self.__reference_invariant_insertion(
+                                self.benchmarks_dir[index],
+                                matches if len(matches) >= 3 else [None, *matches],
+                                witness_variable_info,
+                                row,
+                            )
 
     def __object_variable_matching(self, witness_variable_info, class_identifier_arr):
         """
@@ -422,56 +424,59 @@ class PropertyValidation:
         :param class_identifier_arr: Array of class identifiers in the Java programs
         """
         index = self.__read_index_of_program(witness_variable_info)
-        with open(self.benchmarks_dir[index], "rt") as fin:
-            for row, line in enumerate(fin, 1):
-                if (witness_variable_info["startline"]) == row:
-                    search_result = re.search(
-                        r"\b(\w+\."
-                        + witness_variable_info["property"]
-                        + r")\s*[+\-*/%]?=[+\-*/%]?[^=;]*;",
-                        line,
-                    )
-                    if search_result is not None:
-                        matches = [
-                            sr for sr in search_result.groups() if sr is not None
-                        ]
-                        search_result = re.match(
-                            r"(\b\d+[a-zA-Z]?\b)", witness_variable_info["value"]
-                        )
-                        if search_result is not None:
-                            results = [
-                                sr for sr in search_result.groups() if sr is not None
-                            ]
-                            self.__value_invariant_insertion(
-                                self.benchmarks_dir[index],
-                                matches[0],
-                                witness_variable_info["value"],
-                                row,
-                                witness_variable_info,
-                            )
-                            return
+        if index >=0:
+            with open(self.benchmarks_dir[index], "rt") as fin:
+                for row, line in enumerate(fin, 1):
+                    if (witness_variable_info["startline"]) == row:
                         search_result = re.search(
-                            r"dynamic_object\$(\d+)", witness_variable_info["value"]
+                            r"\b(\w+\."
+                            + witness_variable_info["property"]
+                            + r")\s*[+\-*/%]?=[+\-*/%]?[^=;]*;",
+                            line,
                         )
                         if search_result is not None:
-                            results = [
+                            matches = [
                                 sr for sr in search_result.groups() if sr is not None
                             ]
-                            for class_identifier in class_identifier_arr:
-                                if results[0] == class_identifier["No"]:
-                                    self.__reference_invariant_insertion(
-                                        self.benchmarks_dir[index],
-                                        (
-                                            matches
-                                            if len(matches) >= 2
-                                            else [None, *matches]
-                                        ),
-                                        {"classIdentifier": class_identifier["type"]},
-                                        row,
-                                    )
-                                    return
+                            search_result = re.match(
+                                r"(\b\d+[a-zA-Z]?\b)", witness_variable_info["value"]
+                            )
+                            if search_result is not None:
+                                results = [
+                                    sr for sr in search_result.groups() if sr is not None
+                                ]
+                                self.__value_invariant_insertion(
+                                    self.benchmarks_dir[index],
+                                    matches[0],
+                                    witness_variable_info["value"],
+                                    row,
+                                    witness_variable_info,
+                                )
+                                return
+                            search_result = re.search(
+                                r"dynamic_object\$(\d+)", witness_variable_info["value"]
+                            )
+                            if search_result is not None:
+                                results = [
+                                    sr for sr in search_result.groups() if sr is not None
+                                ]
+                                for class_identifier in class_identifier_arr:
+                                    if results[0] == class_identifier["No"]:
+                                        self.__reference_invariant_insertion(
+                                            self.benchmarks_dir[index],
+                                            (
+                                                matches
+                                                if len(matches) >= 2
+                                                else [None, *matches]
+                                            ),
+                                            {"classIdentifier": class_identifier["type"]},
+                                            row,
+                                        )
+                                        return
 
-    def __condition_judgement(self, regex, witness_variable_info, condition, row, java_file):
+    def __condition_judgement(
+        self, regex, witness_variable_info, condition, row, java_file
+    ):
         """
         Determines if the current invariant is in the main method, if so returns true, otherwise returns false
         :param regex: The regular expression applied to the scope of the current invariant
@@ -492,8 +497,8 @@ class PropertyValidation:
         if search_result is not None:
             matches = [sr for sr in search_result.groups() if sr is not None]
             if (
-                matches[0] == file_name and
-                matches[1] == "main"
+                matches[0] == file_name
+                and matches[1] == "main"
                 and matches[2] == "[Ljava/lang/String;"
                 and matches[3] == "V"
             ):
@@ -539,12 +544,12 @@ class PropertyValidation:
                     return "false" if value == 0 else "true"
         return value
 
-    def __format_text(self,text) -> str:
+    def __format_text(self, text) -> str:
         """
         Formatting the content of the text
         :return: Formated text
         """
-        text = text.replace("$",".")
+        text = text.replace("$", ".")
         return text
 
     def __value_invariant_insertion(
@@ -559,10 +564,14 @@ class PropertyValidation:
         :param witness_variable_info: Information on invariant being processed in the witness
         """
         regex = r"\w+::(\w+)\.(\w+):\((.*)\)(.*)"
-        value = self.__replace_boolean_value(witness_variable_info["scope"], variable_name, value)
+        value = self.__replace_boolean_value(
+            witness_variable_info["scope"], variable_name, value
+        )
         condition = f"{variable_name} == {str(value)}"
         assertion = "assert " + variable_name + " == " + str(value) + ";"
-        result = self.__condition_judgement(regex, witness_variable_info, condition, row, java_file)
+        result = self.__condition_judgement(
+            regex, witness_variable_info, condition, row, java_file
+        )
         if result:
             with open(java_file, "r") as f:
                 lines = f.readlines()
@@ -587,7 +596,9 @@ class PropertyValidation:
         regex = r"\w+::(\w+)\.(\w+):\((.*)\)(.*)"
         if "className" in witness_variable_info:
             condition = "new {0}({1}) instanceof {2}".format(
-                matches[1], matches[2], self.__format_text(witness_variable_info["className"])
+                matches[1],
+                matches[2],
+                self.__format_text(witness_variable_info["className"]),
             )
         else:
             condition = "{0} instanceof {1}".format(

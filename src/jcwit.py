@@ -28,6 +28,17 @@ def dir_path(path):
     raise argparse.ArgumentTypeError(f"readable_dir:{path} is not a valid path")
 
 
+def get_benchmarks(benchmarks) -> list:
+    """
+    Obtaining partial benchmarks
+    :param path: All of the input benchmarks
+    :return: Trimmed benchmarks 
+    """
+    if benchmarks[-1].endswith(".java"):
+        return benchmarks
+    return [benchmarks[-1]]
+
+
 def create_argument_parser() -> argparse.ArgumentParser:
     """
     Creates a parser for the command-line options.
@@ -76,9 +87,13 @@ def main():
 
         wv = WitnessValidation(config["witness_file"])
         pv = PropertyValidation(
-            config["witness_file"], config["benchmark"], config["package_paths"]
+            config["witness_file"],
+            get_benchmarks(config["benchmark"]),
+            config["package_paths"],
         )
-        mp = MonitorProcessor(config["benchmark"], config["package_paths"])
+        mp = MonitorProcessor(
+            get_benchmarks(config["benchmark"]), config["package_paths"]
+        )
 
         witness_file = wv._read_witness()
         entry_node, edge_dict, node_arr, data_num = wv._collate_data(witness_file)
