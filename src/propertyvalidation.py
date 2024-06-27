@@ -69,7 +69,7 @@ class PropertyValidation:
             for path, node in tree.filter(javalang.tree.ClassDeclaration):
                 class_name = node.name
                 for node in node.body:
-                    if node.filter(javalang.tree.MethodDeclaration):
+                    if isinstance(node, javalang.tree.MethodDeclaration):
                         method_name = node.name
                         for node in node.body:
                             if (
@@ -95,7 +95,7 @@ class PropertyValidation:
             for path, node in tree.filter(javalang.tree.ClassDeclaration):
                 class_name = node.name
                 for node in node.body:
-                    if node.filter(javalang.tree.MethodDeclaration):
+                    if isinstance(node, javalang.tree.MethodDeclaration):
                         method_name = node.name
                         for node in node.body:
                             if isinstance(
@@ -324,7 +324,7 @@ class PropertyValidation:
                             matches[0],
                             f'"{witness_variable_info["value"]}"',
                             row,
-                            witness_variable_info["scope"],
+                            witness_variable_info,
                         )
 
     def __value_type_file_match(self, variable_property_arr: list) -> None:
@@ -371,7 +371,7 @@ class PropertyValidation:
                             matches[0],
                             witness_variable_info["value"],
                             row,
-                            witness_variable_info["scope"],
+                            witness_variable_info,
                         )
                     elif method_search_result is not None:
                         continue
@@ -447,7 +447,7 @@ class PropertyValidation:
                                 matches[0],
                                 witness_variable_info["value"],
                                 row,
-                                witness_variable_info["scope"],
+                                witness_variable_info,
                             )
                             return
                         search_result = re.search(
@@ -471,11 +471,11 @@ class PropertyValidation:
                                     )
                                     return
 
-    def __condition_judgement(self, regex, scope, condition, row, java_file):
+    def __condition_judgement(self, regex, witness_variable_info, condition, row, java_file):
         """
         Determines if the current invariant is in the main method, if so returns true, otherwise returns false
         :param regex: The regular expression applied to the scope of the current invariant
-        :param scope: The predicate formed by the current invariant
+        :param witness_variable_info: Information on invariant being processed in the witness
         :param condition: The scope of the current invariant
         :param row: The line number of the current invariant
         :param java_file: The java file to which the current invariant belongs
@@ -487,26 +487,31 @@ class PropertyValidation:
             file_name = self.benchmarks_fileName[0][
                 0 : self.benchmarks_fileName[0].index(".java")
             ]
-        search_result = re.search(regex, scope)
+        class_name = java_file[0 : java_file.index(".java")]
+        search_result = re.search(regex, witness_variable_info["scope"])
         if search_result is not None:
             matches = [sr for sr in search_result.groups() if sr is not None]
             if (
+                matches[0] == file_name and
                 matches[1] == "main"
                 and matches[2] == "[Ljava/lang/String;"
                 and matches[3] == "V"
             ):
                 return True
             else:
-                counter_name = f"{matches[0]}_{matches[1]}_{matches[2].replace('[','').replace('java/lang/String','String').replace(';','')}_{matches[3].replace('[','').replace('java/lang/String','String').replace(';','')}"
+                counter_name = f"{file_name}_{row}"
                 self.method_counter[row] = (
                     (self.method_counter.get(row) + ", " + condition)
                     if self.method_counter.get(row)
                     else condition
                 )
+                for monitor in self.monitor_dir:
+                    if monitor["counterName"] == counter_name:
+                        return False
                 self.monitor_dir.append(
                     {
                         "row": row,
-                        "scope": scope,
+                        "scope": witness_variable_info["scope"],
                         "counterName": counter_name,
                         "fileName": java_file,
                     }
@@ -534,8 +539,16 @@ class PropertyValidation:
                     return "false" if value == 0 else "true"
         return value
 
+    def __format_text(self,text) -> str:
+        """
+        Formatting the content of the text
+        :return: Formated text
+        """
+        text = text.replace("$",".")
+        return text
+
     def __value_invariant_insertion(
-        self, java_file, variable_name, value, row, scope
+        self, java_file, variable_name, value, row, witness_variable_info
     ) -> None:
         """
         Insertion the value-type invariant in the form of assertion into the program to be validated
@@ -543,13 +556,13 @@ class PropertyValidation:
         :param variable_name: The name of the variable of type boolean in the assertion being replaced,
         :param value: The value in the current invariant
         :param row: The line number of the current invariant in the java program
-        :param scope: The predicate formed by the current invariant
+        :param witness_variable_info: Information on invariant being processed in the witness
         """
         regex = r"\w+::(\w+)\.(\w+):\((.*)\)(.*)"
-        value = self.__replace_boolean_value(scope, variable_name, value)
+        value = self.__replace_boolean_value(witness_variable_info["scope"], variable_name, value)
         condition = f"{variable_name} == {str(value)}"
         assertion = "assert " + variable_name + " == " + str(value) + ";"
-        result = self.__condition_judgement(regex, scope, condition, row, java_file)
+        result = self.__condition_judgement(regex, witness_variable_info, condition, row, java_file)
         if result:
             with open(java_file, "r") as f:
                 lines = f.readlines()
@@ -574,16 +587,16 @@ class PropertyValidation:
         regex = r"\w+::(\w+)\.(\w+):\((.*)\)(.*)"
         if "className" in witness_variable_info:
             condition = "new {0}({1}) instanceof {2}".format(
-                matches[1], matches[2], witness_variable_info["className"]
+                matches[1], matches[2], self.__format_text(witness_variable_info["className"])
             )
         else:
             condition = "{0} instanceof {1}".format(
-                matches[0], witness_variable_info["classIdentifier"]
+                matches[0], self.__format_text(witness_variable_info["classIdentifier"])
             )
-
         result = self.__condition_judgement(
-            regex, witness_variable_info["scope"], condition, row, java_file
+            regex, witness_variable_info, condition, row, java_file
         )
+        condition
         if result:
             assertion = f"assert {condition};"
 

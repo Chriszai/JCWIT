@@ -79,8 +79,6 @@ def main():
             config["witness_file"], config["benchmark"], config["package_paths"]
         )
         mp = MonitorProcessor(config["benchmark"], config["package_paths"])
-        mp._monitor_counter_initialization()
-        mp._monitor_counter_insertion()
 
         witness_file = wv._read_witness()
         entry_node, edge_dict, node_arr, data_num = wv._collate_data(witness_file)
@@ -88,8 +86,10 @@ def main():
         print("Witness integrity check completed.")
         connectivity = wv._check_connectivity(edge_dict)
         print("Witness connectivity check completed.")
-        condition_dic, method_dir = pv._assertions_insertion()
-        mp._assertions_selection_insertion(condition_dic, method_dir)
+        condition_dic, methods_arr = pv._assertions_insertion()
+
+        mp._monitor_counter_initialization(condition_dic, methods_arr)
+        mp._assertions_selection_insertion()
 
         vh = ValidationHarness(config["benchmark"], config["package_paths"])
         benchmark = vh._recompile_programs()
