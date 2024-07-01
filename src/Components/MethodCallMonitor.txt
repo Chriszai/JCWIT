@@ -6,7 +6,7 @@ public class MethodCallMonitor {
     * */
 
 
-    public static void assertionImplementation (int index, boolean ... condition) {
+    public static void assertionSelection (int index, boolean ... condition) {
         assert condition[index];
     }
 }

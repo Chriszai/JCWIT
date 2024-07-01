@@ -1,14 +1,14 @@
-import org.sosy_lab.sv_benchmarks.Verifier; import Components.MethodCallMonitor;
+import org.sosy_lab.sv_benchmarks.Verifier;
 
-class Test {
+class ExampleProgram {
     static void isRightTriangle(int a, int b, int c){
        int x;
        if(a > b && a > c){
-           x = a * a; MethodCallMonitor.assertionImplementation(MethodCallMonitor.Test_7 ++, x == 25, x == 100);
+           x = a * a;
        } else if (b > a && b > c) {
            x = b * b;
        } else x = c * c;
-       int y = a * a + b * b + c * c; MethodCallMonitor.assertionImplementation(MethodCallMonitor.Test_11 ++, y == 50, y == 200);
+       int y = a * a + b * b + c * c;
        if(2 * x == y){
            assert true;
        }

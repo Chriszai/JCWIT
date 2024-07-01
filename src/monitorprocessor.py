@@ -81,7 +81,7 @@ class MonitorProcessor:
                 if int(each["row"]) == int(key):
                     with open(each["fileName"], "r") as f:
                         lines = f.readlines()
-                    assertion = f'MethodCallMonitor.assertionImplementation(MethodCallMonitor.{each["counterName"]} ++, {self.condition_dic[key]});'
+                    assertion = f'MethodCallMonitor.assertionSelection(MethodCallMonitor.{each["counterName"]} ++, {self.condition_dic[key]});'
                     lines[int(key) - 1] = (
                         lines[int(key) - 1].rstrip() + " " + assertion + "\n"
                     )
