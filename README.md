@@ -102,7 +102,7 @@ The verification process will output all the invariants extracted from the witne
 The example java program:
 
 ```java
-static void isTriangle(int a, int b, int c){
+static void isRightTriangle(int a, int b, int c){
     int x;
     if(a > b && a > c){
         x = a * a;
@@ -275,14 +275,14 @@ The modified example java program is shown below:
 ```java
 import Components.MethodCallMonitor;
 
-static void isTriangle(int a, int b, int c){
+static void isRightTriangle(int a, int b, int c){
     int x;
     if(a > b && a > c){
-        x = a * a; MethodCallMonitor.assertionImplementation(MethodCallMonitor.Test_isRightTriangle_III_V, x == 25);
+        x = a * a; MethodCallMonitor.assertionSelection(MethodCallMonitor.Test_isRightTriangle_III_V, x == 25);
     } else if (b > a && b > c) {
         x = b * b;
     } else x = c * c;
-    int y = a * a + b * b + c * c; MethodCallMonitor.assertionImplementation(MethodCallMonitor.Test_isRightTriangle_III_V, y == 50);
+    int y = a * a + b * b + c * c; MethodCallMonitor.assertionSelection(MethodCallMonitor.Test_isRightTriangle_III_V, y == 50);
     if(2 * x == y){
         assert true;
     } 
@@ -306,7 +306,7 @@ public class MethodCallMonitor {
     public static int Test_main_LString_V = 0;
     public static int Test_isRightTriangle_III_V = 0;
 
-    public static void assertionImplementation (int index, boolean ... condition) {
+    public static void assertionSelection (int index, boolean ... condition) {
         assert condition[index];
     }
 }
