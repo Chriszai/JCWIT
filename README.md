@@ -3,7 +3,7 @@
 
 # Description
 
-JCWIT is a  correctness-witness validator used for validating result output by Java verifiers. It takes a Java program with safety properties and the corresponding correctness witnesses to validate the verification results. JCWIT extracts the invariants from the correctness witnesses and re-injects them as assertion statements into the original program using the Mockito framework. A Java model checker is used to re-verify these assertion statements to check whether they are hold in the original Java program. In addition, JCWIT determines the completeness of the correctness witnesses by checking for the existence of cycles.
+Witness validation is a formal verification method to independently verify software verification tool results, with two main categories: violation and correctness witness validators. Validators for violation witnesses in Java include Wit4Java and GWIT, but no dedicated correctness witness validators exist. To address this gap, we presents the Java Correctness-Witness Validator (JCWIT), the first tool to validate correctness witnesses in Java programs. JCWIT accepts an original program, a specification, and a correctness witness as inputs. Then, it uses invariants of each witness's execution state as conditions to be incorporated into the original program in the form of assertions, thus instrumenting it. Next, JCWIT employs an established tool, Java Bounded Model Checker (JBMC), to verify the transformed program, hence examining the reproducibility of correct witness results.
 
 # Architecture
 
